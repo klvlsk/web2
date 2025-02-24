@@ -63,8 +63,8 @@ if ($errors) {
 }
 
 // Подключение к базе данных
-$user = 'u68596'; // Замените на ваш логин
-$pass = '2859691'; // Замените на ваш пароль
+$user = 'u68596';
+$pass = '2859691';
 $db = new PDO('mysql:host=localhost;dbname=u68596', $user, $pass, [
     PDO::ATTR_PERSISTENT => true,
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
