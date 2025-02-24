@@ -47,7 +47,7 @@ if (empty($_POST['languages']) || !is_array($_POST['languages'])) {
     $errors = TRUE;
 }
 
-if (strlen($_POST['biography']) > 500) {
+if (empty($_POST['biography']) || strlen($_POST['biography']) > 500) {
     print('Заполните биографию (не более 500 символов).<br/>');
     $errors = TRUE;
 }
