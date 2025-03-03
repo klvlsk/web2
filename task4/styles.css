@@ -91,11 +91,6 @@ input[type="submit"]:hover {
     background-color: #003366; /* Цвет фона при наведении */
 }
 
-/* Стили для сообщений об ошибках */
-.error {
-    border: 2px solid red; /* Красная рамка для полей с ошибками */
-}
-
 /* Стили для сообщений */
 #messages {
     margin-bottom: 20px; /* Отступ снизу */
@@ -103,22 +98,30 @@ input[type="submit"]:hover {
     border-radius: 4px; /* Скругление углов */
 }
 
-/* Стили для сообщений об ошибках */
-#messages .error {
-    margin: 5px 0; /* Отступы для сообщений об ошибках */
-    color: #c62828; /* Цвет текста */
-    background-color: #ffebee; /* Фоновый цвет для сообщений об ошибках */
-    border: 1px solid #ffcdd2; /* Граница */
-    padding: 10px; /* Внутренние отступы */
+.error {
+    border: 2px solid red;
 }
 
-/* Стили для сообщений об успехе */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+#messages .error {
+    color: #c62828;
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    padding: 10px;
+    margin: 5px 0;
+}
+
 #messages .success {
-    margin: 5px 0; /* Отступы для сообщений об успехе */
-    color: #2e7d32; /* Цвет текста */
-    background-color: #e8f5e9; /* Фоновый цвет для сообщений об успехе */
-    border: 1px solid #c8e6c9; /* Граница */
-    padding: 10px; /* Внутренние отступы */
+    color: #2e7d32;
+    background-color: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    padding: 10px;
+    margin: 5px 0;
 }
 
 /* Стили для выбранных значений в select */

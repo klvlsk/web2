@@ -25,12 +25,15 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
                     if (!empty($messages)) {
                         print('<div id="messages">');
                         foreach ($messages as $message) {
-                            // Если сообщение об успехе, добавляем класс success
-                            if (strpos($message, 'Спасибо') !== false) {
-                                print('<div class="success">' . $message . '</div>');
-                            } else {
-                                print('<div class="error">' . $message . '</div>');
-                            }
+                            print('<div class="success">' . $message . '</div>');
+                        }
+                        print('</div>');
+                    }
+
+                    if (!empty($errors)) {
+                        print('<div id="messages">');
+                        foreach ($errors as $error) {
+                            print('<div class="error">' . $error . '</div>');
                         }
                         print('</div>');
                     }
