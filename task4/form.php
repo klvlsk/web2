@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Инициализируем массивы, чтобы избежать ошибок
 $errors = $_SESSION['errors'] ?? [];
 $values = $_SESSION['values'] ?? [];
@@ -15,26 +19,25 @@ echo '<link rel="stylesheet" href="styles.css">';
 <html>
   <body>
     <main>
-    <form action="form.php" method="POST" novalidate>
-      <div class="change">
-        <div id="form">
-          <?php
-          // Вывод сообщений об ошибках и успехе
-          if (!empty($messages)) {
-            print('<div id="messages">');
-            foreach ($messages as $message) {
-              // Если сообщение об успехе, добавляем класс success
-              if (strpos($message, 'Спасибо') !== false) {
-                print('<div class="success">' . $message . '</div>');
-              } else {
-                print('<div class="error">' . $message . '</div>');
+      <form action="index.php" method="POST" novalidate>
+        <div class="change">
+          <div id="form">
+            <?php
+            // Вывод сообщений об ошибках и успехе
+            if (!empty($messages)) {
+              print('<div id="messages">');
+              foreach ($messages as $message) {
+                // Если сообщение об успехе, добавляем класс success
+                if (strpos($message, 'Спасибо') !== false) {
+                  print('<div class="success">' . $message . '</div>');
+                } else {
+                  print('<div class="error">' . $message . '</div>');
+                }
               }
+              print('</div>');
             }
-            print('</div>');
-          }
-          ?>
+            ?>
 
-          <form action="index.php" method="POST">
             <label>ФИО:</label>
             <input type="text" name="fio" required pattern="[A-Za-zА-Яа-я\s]{1,150}" maxlength="150" <?php if (!empty($errors['fio'])) {print 'class="error"';} ?> value="<?php echo htmlspecialchars($values['fio'] ?? ''); ?>"><br>
 
@@ -83,9 +86,9 @@ echo '<link rel="stylesheet" href="styles.css">';
             </label><br>
 
             <input type="submit" value="Сохранить">
-          </form>
+          </div>
         </div>
-      </div>
+      </form>
     </main>
   </body>
 </html>
