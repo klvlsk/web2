@@ -10,6 +10,12 @@
   <body>
 
 <?php
+// Подключаем стили
+echo '<link rel="stylesheet" href="styles.css">';
+?>
+
+
+<?php
 if (!empty($messages)) {
   print('<div id="messages">');
   // Выводим все сообщения.
