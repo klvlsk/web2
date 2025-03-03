@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
   }
   setcookie('fio_value', $_POST['fio'], time() + 30 * 24 * 60 * 60);
 
-  if (empty($_POST['phone']) || !preg_match('/^\+7\d{10}$/', $_POST['phone'])) {
+  if (empty($_POST['phone']) || !preg_match('/^\+7\d{10}$/', $_POST['phone']) || strlen($_POST['phone']) > 20) {
     setcookie('phone_error', '1', time() + 24 * 60 * 60);
     $errors = TRUE;
   }
@@ -162,10 +162,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $stmt = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
         $stmt->execute([$application_id, $language_id]);
     }
-  } catch (PDOException $e) {
-    print('Ошибка при сохранении данных: ' . $e->getMessage());
+} catch (PDOException $e) {
+    // Сохраняем ошибку в сообщения
+    $messages[] = '<div class="error-message">Ошибка при сохранении данных: ' . $e->getMessage() . '</div>';
+    include('form.php');
     exit();
-  }
+}
 
   setcookie('save', '1');
   header('Location: index.php');

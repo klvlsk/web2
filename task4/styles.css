@@ -19,14 +19,26 @@ body {
 }
 
 /* Стили для основного контейнера */
+/* Увеличиваем ширину основного контейнера */
 main {
-    max-width: 960px; /* Максимальная ширина контейнера */
-    padding: 20px; /* Внутренние отступы */
-    padding-bottom: 40px; /* Отступ снизу */
-    margin: 0 auto; /* Центрирование контейнера */
-    background-color: #ffffff; /* Фоновый цвет контейнера */
-    border-radius: 8px; /* Скругление углов */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень */
+    max-width: 800px; /* Было 960px, уменьшим для лучшей читаемости */
+    width: 90%; /* Занимает 90% ширины экрана */
+    padding: 20px;
+    padding-bottom: 40px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Увеличиваем ширину формы */
+form {
+    max-width: 600px; /* Было 500px, увеличим для лучшей читаемости */
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Стили для контейнера с классом .change */
@@ -46,16 +58,6 @@ main > .change {
     main > .change {
         flex-direction: column-reverse; /* Элементы в обратном порядке */
     }
-}
-
-/* Дополнительные стили для формы */
-form {
-    max-width: 500px; /* Максимальная ширина формы */
-    margin: 0 auto; /* Центрирование формы */
-    padding: 20px; /* Внутренние отступы */
-    background-color: #ffffff; /* Фоновый цвет формы */
-    border-radius: 8px; /* Скругление углов */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень */
 }
 
 label {
