@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     // Если есть кука с сообщением об успешном сохранении, выводим его
     if (!empty($_COOKIE['save'])) {
-        setcookie('save', '', 100000); // Удаляем куку
+        setcookie('save', '', time() - 3600); // Удаляем куку
         $messages[] = 'Спасибо, результаты сохранены.';
     }
 
@@ -114,6 +114,7 @@ if (!empty($errors)) {
 }
 
 // Удаляем куки с ошибками
+$error_fields = ['fio', 'phone', 'email', 'birth_date', 'gender', 'languages', 'biography', 'contract_agreed'];
 foreach ($error_fields as $field) {
     setcookie($field . '_error', '', time() - 3600);
     setcookie($field . '_value', '', time() - 3600);
