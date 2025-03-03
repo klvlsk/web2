@@ -53,58 +53,50 @@ $messages = []; // Инициализируем массив для сообще
 if (empty($_POST['fio']) || !preg_match('/^[A-Za-zА-Яа-я\s]{1,150}$/u', $_POST['fio'])) {
     $errors['fio'] = 'Заполните корректно ФИО (только буквы и пробелы, не более 150 символов).';
     setcookie('fio_error', $errors['fio'], time() + 24 * 60 * 60);
-} else {
-    setcookie('fio_value', $_POST['fio'], time() + 365 * 24 * 60 * 60); // Сохраняем на год
 }
+setcookie('fio_value', $_POST['fio'], time() + 30 * 24 * 60 * 60); // Сохраняем значение, даже если оно неправильное
 
 if (empty($_POST['phone']) || !preg_match('/^\+7\d{10}$/', $_POST['phone'])) {
     $errors['phone'] = 'Заполните корректно телефон (формат: +7XXXXXXXXXX).';
     setcookie('phone_error', $errors['phone'], time() + 24 * 60 * 60);
-} else {
-    setcookie('phone_value', $_POST['phone'], time() + 365 * 24 * 60 * 60); // Сохраняем на год
 }
+setcookie('phone_value', $_POST['phone'], time() + 30 * 24 * 60 * 60); // Сохраняем значение, даже если оно неправильное
 
 if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
     $errors['email'] = 'Заполните корректно email.';
     setcookie('email_error', $errors['email'], time() + 24 * 60 * 60);
-} else {
-    setcookie('email_value', $_POST['email'], time() + 365 * 24 * 60 * 60); // Сохраняем на год
 }
+setcookie('email_value', $_POST['email'], time() + 30 * 24 * 60 * 60); // Сохраняем значение, даже если оно неправильное
 
 if (empty($_POST['birth_date']) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST['birth_date'])) {
     $errors['birth_date'] = 'Заполните корректно дату рождения (формат: YYYY-MM-DD).';
     setcookie('birth_date_error', $errors['birth_date'], time() + 24 * 60 * 60);
-} else {
-    setcookie('birth_date_value', $_POST['birth_date'], time() + 365 * 24 * 60 * 60); // Сохраняем на год
 }
+setcookie('birth_date_value', $_POST['birth_date'], time() + 30 * 24 * 60 * 60); // Сохраняем значение, даже если оно неправильное
 
 if (empty($_POST['gender']) || !in_array($_POST['gender'], ['male', 'female'])) {
     $errors['gender'] = 'Выберите пол.';
     setcookie('gender_error', $errors['gender'], time() + 24 * 60 * 60);
-} else {
-    setcookie('gender_value', $_POST['gender'], time() + 365 * 24 * 60 * 60); // Сохраняем на год
 }
+setcookie('gender_value', $_POST['gender'], time() + 30 * 24 * 60 * 60); // Сохраняем значение, даже если оно неправильное
 
 if (empty($_POST['languages']) || !is_array($_POST['languages'])) {
     $errors['languages'] = 'Выберите хотя бы один язык программирования.';
     setcookie('languages_error', $errors['languages'], time() + 24 * 60 * 60);
-} else {
-    setcookie('languages_value', json_encode($_POST['languages']), time() + 365 * 24 * 60 * 60); // Сохраняем на год
 }
+setcookie('languages_value', json_encode($_POST['languages']), time() + 30 * 24 * 60 * 60); // Сохраняем значение, даже если оно неправильное
 
 if (empty(trim($_POST['biography'])) || strlen($_POST['biography']) > 500) {
     $errors['biography'] = 'Заполните биографию (не более 500 символов).';
     setcookie('biography_error', $errors['biography'], time() + 24 * 60 * 60);
-} else {
-    setcookie('biography_value', $_POST['biography'], time() + 365 * 24 * 60 * 60); // Сохраняем на год
 }
+setcookie('biography_value', $_POST['biography'], time() + 30 * 24 * 60 * 60); // Сохраняем значение, даже если оно неправильное
 
 if (empty($_POST['contract_agreed'])) {
     $errors['contract_agreed'] = 'Необходимо согласие с контрактом.';
     setcookie('contract_agreed_error', $errors['contract_agreed'], time() + 24 * 60 * 60);
-} else {
-    setcookie('contract_agreed_value', $_POST['contract_agreed'], time() + 365 * 24 * 60 * 60); // Сохраняем на год
 }
+setcookie('contract_agreed_value', $_POST['contract_agreed'], time() + 30 * 24 * 60 * 60); // Сохраняем значение, даже если оно неправильное
 
 // Если есть ошибки, сохраняем их в сессии и перенаправляем
 if (!empty($errors)) {

@@ -21,22 +21,11 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
             <div class="change">
                 <div id="form">
                     <?php
-                    // Вывод сообщений об ошибках и успехе
+                    // Вывод сообщений об успехе
                     if (!empty($messages)) {
                         print('<div id="messages">');
                         foreach ($messages as $message) {
                             print('<div class="success">' . $message . '</div>');
-                        }
-                        print('</div>');
-                    }
-
-                    // Вывод ошибок только для тех полей, где они есть
-                    if (!empty($errors)) {
-                        print('<div id="messages">');
-                        foreach ($errors as $field => $error) {
-                            if (!empty($error)) {
-                                print('<div class="error">' . $error . '</div>');
-                            }
                         }
                         print('</div>');
                     }
