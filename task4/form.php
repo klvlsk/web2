@@ -30,10 +30,13 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
                         print('</div>');
                     }
 
+                    // Вывод ошибок только для тех полей, где они есть
                     if (!empty($errors)) {
                         print('<div id="messages">');
-                        foreach ($errors as $error) {
-                            print('<div class="error">' . $error . '</div>');
+                        foreach ($errors as $field => $error) {
+                            if (!empty($error)) {
+                                print('<div class="error">' . $error . '</div>');
+                            }
                         }
                         print('</div>');
                     }
