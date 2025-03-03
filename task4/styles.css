@@ -3,6 +3,7 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%; /* Занимаем всю высоту экрана */
+    overflow: auto; /* Разрешаем прокрутку */
 }
 
 /* Стили для body */
@@ -14,50 +15,32 @@ body {
     background-color: #d4ebff; /* Фоновый цвет страницы */
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Выравниваем форму по верху */
     min-height: 100vh; /* Минимальная высота на весь экран */
+    padding: 20px; /* Добавляем отступы */
+    box-sizing: border-box; /* Учитываем padding в размерах */
 }
 
 /* Стили для основного контейнера */
-/* Увеличиваем ширину основного контейнера */
 main {
-    max-width: 800px; /* Было 960px, уменьшим для лучшей читаемости */
-    width: 90%; /* Занимает 90% ширины экрана */
-    padding: 20px;
-    padding-bottom: 40px;
-    margin: 0 auto;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Увеличиваем ширину формы */
-form {
-    max-width: 600px; /* Было 500px, увеличим для лучшей читаемости */
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Стили для контейнера с классом .change */
-main > .change {
-    display: flex;
-    flex-direction: column; /* Элементы в колонку */
+    max-width: 800px; /* Максимальная ширина контейнера */
+    width: 100%; /* Занимает всю доступную ширину */
+    padding: 20px; /* Внутренние отступы */
+    background-color: #ffffff; /* Фоновый цвет контейнера */
+    border-radius: 8px; /* Скругление углов */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень */
+    margin: 0 auto; /* Центрирование контейнера */
 }
 
 /* Стили для формы */
-#form {
-    flex: 1; /* Занимает доступное пространство */
-    order: 3; /* Порядок отображения */
-}
-
-/* Медиа-запрос для экранов шире 800px */
-@media screen and (min-width: 800px) {
-    main > .change {
-        flex-direction: column-reverse; /* Элементы в обратном порядке */
-    }
+form {
+    max-width: 600px; /* Максимальная ширина формы */
+    width: 100%; /* Занимает всю доступную ширину */
+    margin: 0 auto; /* Центрирование формы */
+    padding: 20px; /* Внутренние отступы */
+    background-color: #ffffff; /* Фоновый цвет формы */
+    border-radius: 8px; /* Скругление углов */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень */
 }
 
 label {
@@ -74,6 +57,7 @@ input, select, textarea {
     border: 1px solid #ccc; /* Граница */
     border-radius: 4px; /* Скругление углов */
     font-family: cursive, sans-serif; /* Шрифт с запасным вариантом */
+    box-sizing: border-box; /* Учитываем padding в размерах */
 }
 
 input[type="radio"], input[type="checkbox"] {
@@ -90,6 +74,7 @@ input[type="submit"] {
     border-radius: 4px; /* Скругление углов */
     font-size: 16px; /* Размер шрифта */
     margin-top: 20px; /* Отступ сверху */
+    width: auto; /* Автоматическая ширина */
 }
 
 input[type="submit"]:hover {
