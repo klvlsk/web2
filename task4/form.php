@@ -6,6 +6,7 @@ echo '<link rel="stylesheet" href="styles.css">';
 <html>
   <body>
     <main>
+    <form action="form.php" method="POST" novalidate>
       <div class="change">
         <div id="form">
           <?php
@@ -24,7 +25,7 @@ echo '<link rel="stylesheet" href="styles.css">';
           }
           ?>
 
-          <form method="post" action="index.php">
+          <form action="index.php">
             <label>ФИО:</label>
             <input type="text" name="fio" required pattern="[A-Za-zА-Яа-я\s]{1,150}" maxlength="150" <?php if ($errors['fio']) {print 'class="error"';} ?> value="<?php print $values['fio']; ?>"><br>
 
