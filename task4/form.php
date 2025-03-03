@@ -6,18 +6,6 @@ echo '<link rel="stylesheet" href="styles.css">';
 <html>
   <body>
 
-<?php
-// Проверяем, есть ли сообщения об ошибках
-if (!empty($messages)) {
-  print('<div id="messages">');
-  // Выводим все сообщения.
-  foreach ($messages as $message) {
-    print($message);
-  }
-  print('</div>');
-}
-?>
-
 <main>
   <div class="change">
     <div id="form">
