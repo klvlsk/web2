@@ -5,15 +5,17 @@
       .error {
         border: 2px solid red;
       }
+      #messages {
+        margin-bottom: 20px;
+      }
+      .error-message {
+        color: red;
+        margin-bottom: 10px;
+      }
     </style>
+    <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-
-<?php
-// Подключаем стили
-echo '<link rel="stylesheet" href="styles.css">';
-?>
-
 
 <?php
 if (!empty($messages)) {
@@ -24,9 +26,6 @@ if (!empty($messages)) {
   }
   print('</div>');
 }
-
-// Далее выводим форму, отмечая элементы с ошибками классом error
-// и задавая начальные значения элементов ранее сохраненными.
 ?>
 
     <form action="" method="POST">
@@ -40,7 +39,7 @@ if (!empty($messages)) {
       <input name="email" <?php if ($errors['email']) {print 'class="error"';} ?> value="<?php print $values['email']; ?>" /><br>
 
       <label>Дата рождения:</label>
-      <input name="birth_date" <?php if ($errors['birth_date']) {print 'class="error"';} ?> value="<?php print $values['birth_date']; ?>" /><br>
+      <input type="date" name="birth_date" <?php if ($errors['birth_date']) {print 'class="error"';} ?> value="<?php print $values['birth_date']; ?>" /><br>
 
       <label>Пол:</label>
       <input type="radio" name="gender" value="male" <?php if ($values['gender'] === 'male') {print 'checked';} ?>> Мужской

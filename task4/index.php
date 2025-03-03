@@ -22,42 +22,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
   if ($errors['fio']) {
     setcookie('fio_error', '', 100000);
     setcookie('fio_value', '', 100000);
-    $messages[] = '<div class="error">Заполните имя.</div>';
+    $messages[] = '<div class="error-message">Заполните имя (только кириллица и пробелы).</div>';
   }
   if ($errors['phone']) {
     setcookie('phone_error', '', 100000);
     setcookie('phone_value', '', 100000);
-    $messages[] = '<div class="error">Заполните телефон.</div>';
+    $messages[] = '<div class="error-message">Заполните телефон (формат: +7XXXXXXXXXX).</div>';
   }
   if ($errors['email']) {
     setcookie('email_error', '', 100000);
     setcookie('email_value', '', 100000);
-    $messages[] = '<div class="error">Заполните email.</div>';
+    $messages[] = '<div class="error-message">Заполните email (формат: example@example.com).</div>';
   }
   if ($errors['birth_date']) {
     setcookie('birth_date_error', '', 100000);
     setcookie('birth_date_value', '', 100000);
-    $messages[] = '<div class="error">Заполните дату рождения.</div>';
+    $messages[] = '<div class="error-message">Заполните дату рождения (формат: YYYY-MM-DD).</div>';
   }
   if ($errors['gender']) {
     setcookie('gender_error', '', 100000);
     setcookie('gender_value', '', 100000);
-    $messages[] = '<div class="error">Выберите пол.</div>';
+    $messages[] = '<div class="error-message">Выберите пол.</div>';
   }
   if ($errors['languages']) {
     setcookie('languages_error', '', 100000);
     setcookie('languages_value', '', 100000);
-    $messages[] = '<div class="error">Выберите хотя бы один язык программирования.</div>';
+    $messages[] = '<div class="error-message">Выберите хотя бы один язык программирования.</div>';
   }
   if ($errors['biography']) {
     setcookie('biography_error', '', 100000);
     setcookie('biography_value', '', 100000);
-    $messages[] = '<div class="error">Заполните биографию.</div>';
+    $messages[] = '<div class="error-message">Заполните биографию.</div>';
   }
   if ($errors['contract_agreed']) {
     setcookie('contract_agreed_error', '', 100000);
     setcookie('contract_agreed_value', '', 100000);
-    $messages[] = '<div class="error">Необходимо согласие с контрактом.</div>';
+    $messages[] = '<div class="error-message">Необходимо согласие с контрактом.</div>';
   }
 
   $values = array();
@@ -74,25 +74,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 } else {
   $errors = FALSE;
 
-  if (empty($_POST['fio'])) {
+  if (empty($_POST['fio']) || !preg_match('/^[А-Яа-яЁё\s]{1,150}$/u', $_POST['fio'])) {
     setcookie('fio_error', '1', time() + 24 * 60 * 60);
     $errors = TRUE;
   }
   setcookie('fio_value', $_POST['fio'], time() + 30 * 24 * 60 * 60);
 
-  if (empty($_POST['phone'])) {
+  if (empty($_POST['phone']) || !preg_match('/^\+7\d{10}$/', $_POST['phone'])) {
     setcookie('phone_error', '1', time() + 24 * 60 * 60);
     $errors = TRUE;
   }
   setcookie('phone_value', $_POST['phone'], time() + 30 * 24 * 60 * 60);
 
-  if (empty($_POST['email'])) {
+  if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
     setcookie('email_error', '1', time() + 24 * 60 * 60);
     $errors = TRUE;
   }
   setcookie('email_value', $_POST['email'], time() + 30 * 24 * 60 * 60);
 
-  if (empty($_POST['birth_date'])) {
+  if (empty($_POST['birth_date']) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST['birth_date'])) {
     setcookie('birth_date_error', '1', time() + 24 * 60 * 60);
     $errors = TRUE;
   }
@@ -123,8 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
   setcookie('contract_agreed_value', $_POST['contract_agreed'], time() + 30 * 24 * 60 * 60);
 
   if ($errors) {
-    header('Location: index.php');
-    exit();
+    // Не перенаправляем, а просто продолжаем выполнение
   } else {
     setcookie('fio_error', '', 100000);
     setcookie('phone_error', '', 100000);

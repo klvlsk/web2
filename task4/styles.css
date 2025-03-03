@@ -2,6 +2,7 @@
 html, body {
     margin: 0;
     padding: 0;
+    height: 100%; /* Занимаем всю высоту экрана */
 }
 
 /* Стили для body */
@@ -11,26 +12,27 @@ body {
     font-style: normal;
     color: #004b90; /* Цвет текста */
     background-color: #d4ebff; /* Фоновый цвет страницы */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Минимальная высота на весь экран */
 }
 
 /* Стили для основного контейнера */
 main {
     max-width: 960px; /* Максимальная ширина контейнера */
-    padding: 10px; /* Внутренние отступы */
+    padding: 20px; /* Внутренние отступы */
     padding-bottom: 40px; /* Отступ снизу */
     margin: 0 auto; /* Центрирование контейнера */
-    background-color: #d4ebff; /* Фоновый цвет контейнера */
+    background-color: #ffffff; /* Фоновый цвет контейнера */
+    border-radius: 8px; /* Скругление углов */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень */
 }
 
 /* Стили для контейнера с классом .change */
 main > .change {
     display: flex;
     flex-direction: column; /* Элементы в колонку */
-}
-
-/* Стили для фона */
-.background {
-    background-color: #d4ebff; /* Фоновый цвет */
 }
 
 /* Стили для формы */
@@ -85,6 +87,7 @@ input[type="submit"] {
     padding: 10px 20px; /* Внутренние отступы */
     border-radius: 4px; /* Скругление углов */
     font-size: 16px; /* Размер шрифта */
+    margin-top: 20px; /* Отступ сверху */
 }
 
 input[type="submit"]:hover {
@@ -93,13 +96,17 @@ input[type="submit"]:hover {
 
 /* Сообщения об ошибках и поля с ошибками выводим с красным бордюром. */
 .error {
-    border: 2px solid red;
+    border: 2px solid red !important; /* Яркая подсветка для полей с ошибками */
 }
 
 /* Стили для сообщений об ошибках */
-.errors {
-    color: red; /* Цвет текста */
+#messages {
     margin-bottom: 20px; /* Отступ снизу */
+}
+
+.error-message {
+    color: red; /* Цвет текста */
+    margin-bottom: 10px; /* Отступ снизу */
     padding: 10px; /* Внутренние отступы */
     background-color: #ffe6e6; /* Фоновый цвет */
     border: 1px solid red; /* Граница */
@@ -107,9 +114,9 @@ input[type="submit"]:hover {
 }
 
 /* Стили для сообщений об успешном сохранении */
-#messages {
+.success-message {
     color: green; /* Цвет текста */
-    margin-bottom: 20px; /* Отступ снизу */
+    margin-bottom: 10px; /* Отступ снизу */
     padding: 10px; /* Внутренние отступы */
     background-color: #e6ffe6; /* Фоновый цвет */
     border: 1px solid green; /* Граница */
