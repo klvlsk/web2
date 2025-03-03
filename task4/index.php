@@ -136,6 +136,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     setcookie('contract_agreed_error', '', 100000);
   }
 
+  // Подключение к базе данных
+  $user = 'u68596';
+  $pass = '2859691';
+  $db = new PDO('mysql:host=localhost;dbname=u68596', $user, $pass, [
+      PDO::ATTR_PERSISTENT => true,
+      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+  ]);
+
+  try {
+    // Вставка данных в таблицу application
+    $stmt = $db->prepare("INSERT INTO application (full_name, phone, email, birth_date, gender, biography, contract_agreed) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([
+        $_POST['fio'],
+        $_POST['phone'],
+        $_POST['email'],
+        $_POST['birth_date'],
+        $_POST['gender'],
+        $_POST['biography'],
+        $_POST['contract_agreed'] ? 1 : 0
+    ]);
+    $application_id = $db->lastInsertId();
+
+    // Вставка выбранных языков программирования
+    foreach ($_POST['languages'] as $language_id) {
+        $stmt = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
+        $stmt->execute([$application_id, $language_id]);
+    }
+  } catch (PDOException $e) {
+    print('Ошибка при сохранении данных: ' . $e->getMessage());
+    exit();
+  }
+
   setcookie('save', '1');
   header('Location: index.php');
 }
