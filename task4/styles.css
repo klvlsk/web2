@@ -96,17 +96,29 @@ input[type="submit"]:hover {
     border: 2px solid red; /* Красная рамка для полей с ошибками */
 }
 
+/* Стили для сообщений */
 #messages {
     margin-bottom: 20px; /* Отступ снизу */
     padding: 10px; /* Внутренние отступы */
-    background-color: #ffebee; /* Фоновый цвет для сообщений */
-    border: 1px solid #ffcdd2; /* Граница */
     border-radius: 4px; /* Скругление углов */
-    color: #c62828; /* Цвет текста */
 }
 
+/* Стили для сообщений об ошибках */
 #messages .error {
     margin: 5px 0; /* Отступы для сообщений об ошибках */
+    color: #c62828; /* Цвет текста */
+    background-color: #ffebee; /* Фоновый цвет для сообщений об ошибках */
+    border: 1px solid #ffcdd2; /* Граница */
+    padding: 10px; /* Внутренние отступы */
+}
+
+/* Стили для сообщений об успехе */
+#messages .success {
+    margin: 5px 0; /* Отступы для сообщений об успехе */
+    color: #2e7d32; /* Цвет текста */
+    background-color: #e8f5e9; /* Фоновый цвет для сообщений об успехе */
+    border: 1px solid #c8e6c9; /* Граница */
+    padding: 10px; /* Внутренние отступы */
 }
 
 /* Стили для выбранных значений в select */
