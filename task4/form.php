@@ -4,14 +4,6 @@ echo '<link rel="stylesheet" href="styles.css">';
 ?>
 
 <html>
-  <head>
-    <style>
-      /* Сообщения об ошибках и поля с ошибками выводим с красным бордюром. */
-      .error {
-        border: 2px solid red;
-      }
-    </style>
-  </head>
   <body>
 
 <?php
@@ -29,6 +21,22 @@ if (!empty($messages)) {
 <main>
   <div class="change">
     <div id="form">
+      <?php
+      // Вывод сообщений об ошибках и успехе
+      if (!empty($messages)) {
+        print('<div id="messages">');
+        foreach ($messages as $message) {
+          // Если сообщение об успехе, добавляем класс success
+          if (strpos($message, 'Спасибо') !== false) {
+            print('<div class="success">' . $message . '</div>');
+          } else {
+            print('<div class="error">' . $message . '</div>');
+          }
+        }
+        print('</div>');
+      }
+      ?>
+
       <form method="post" action="index.php">
         <label>ФИО:</label>
         <input type="text" name="fio" required pattern="[A-Za-zА-Яа-я\s]{1,150}" maxlength="150" <?php if ($errors['fio']) {print 'class="error"';} ?> value="<?php print $values['fio']; ?>"><br>
