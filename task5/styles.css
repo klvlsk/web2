@@ -1,101 +1,92 @@
-/* Общие стили для HTML и body */
 html, body {
     margin: 0;
     padding: 0;
 }
 
-/* Стили для body */
 body {
-    font-family: cursive, sans-serif; /* Шрифт с запасным вариантом */
+    font-family: cursive, sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
-    color: #004b90; /* Цвет текста */
-    background-color: #d4ebff; /* Фоновый цвет страницы */
+    color: #004b90;
+    background-color: #d4ebff;
 }
 
-/* Стили для основного контейнера */
 main {
-    max-width: 960px; /* Максимальная ширина контейнера */
-    padding: 10px; /* Внутренние отступы */
-    padding-bottom: 40px; /* Отступ снизу */
-    margin: 0 auto; /* Центрирование контейнера */
-    background-color: #d4ebff; /* Фоновый цвет контейнера */
+    max-width: 960px;
+    padding: 10px;
+    padding-bottom: 40px;
+    margin: 0 auto;
+    background-color: #d4ebff;
 }
 
-/* Стили для контейнера с классом .change */
 main > .change {
     display: flex;
-    flex-direction: column; /* Элементы в колонку */
+    flex-direction: column;
 }
 
-/* Стили для фона */
 .background {
-    background-color: #d4ebff; /* Фоновый цвет */
+    background-color: #d4ebff;
 }
 
-/* Стили для формы */
 #form {
-    flex: 1; /* Занимает доступное пространство */
-    order: 3; /* Порядок отображения */
+    flex: 1;
+    order: 3;
 }
 
-/* Медиа-запрос для экранов шире 800px */
 @media screen and (min-width: 800px) {
     main > .change {
-        flex-direction: column-reverse; /* Элементы в обратном порядке */
+        flex-direction: column-reverse;
     }
 }
 
-/* Дополнительные стили для формы */
 form {
-    max-width: 500px; /* Максимальная ширина формы */
-    margin: 0 auto; /* Центрирование формы */
-    padding: 20px; /* Внутренние отступы */
-    background-color: #ffffff; /* Фоновый цвет формы */
-    border-radius: 8px; /* Скругление углов */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень */
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 label {
-    display: block; /* Каждая метка на новой строке */
-    margin-top: 10px; /* Отступ сверху */
-    font-weight: bold; /* Жирный шрифт */
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
 }
 
 input, select, textarea {
-    width: 100%; /* Ширина на всю доступную ширину */
-    padding: 8px; /* Внутренние отступы */
-    margin-top: 5px; /* Отступ сверху */
-    margin-bottom: 10px; /* Отступ снизу */
-    border: 1px solid #ccc; /* Граница */
-    border-radius: 4px; /* Скругление углов */
-    font-family: cursive, sans-serif; /* Шрифт с запасным вариантом */
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: cursive, sans-serif;
 }
 
 input[type="radio"], input[type="checkbox"] {
-    width: auto; /* Автоматическая ширина */
-    margin-right: 10px; /* Отступ справа */
+    width: auto;
+    margin-right: 10px;
 }
 
 input[type="submit"] {
-    background-color: #004b90; /* Цвет фона */
-    color: white; /* Цвет текста */
-    border: none; /* Убираем границу */
-    cursor: pointer; /* Курсор в виде указателя */
-    padding: 10px 20px; /* Внутренние отступы */
-    border-radius: 4px; /* Скругление углов */
-    font-size: 16px; /* Размер шрифта */
+    background-color: #004b90;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 16px;
 }
 
 input[type="submit"]:hover {
-    background-color: #003366; /* Цвет фона при наведении */
+    background-color: #003366;
 }
 
-/* Стили для сообщений */
 #messages {
-    margin-bottom: 20px; /* Отступ снизу */
-    padding: 10px; /* Внутренние отступы */
-    border-radius: 4px; /* Скругление углов */
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 4px;
 }
 
 .error {
@@ -124,20 +115,17 @@ input[type="submit"]:hover {
     margin: 5px 0;
 }
 
-/* Стили для выбранных значений в select */
 select option:checked {
-    background-color: #004b90; /* Цвет фона для выбранных элементов */
-    color: white; /* Цвет текста */
+    background-color: #004b90;
+    color: white;
 }
 
-/* Стили для текстовых полей с ошибками */
 input.error, select.error, textarea.error {
-    border-color: red; /* Красная граница для полей с ошибками */
+    border-color: red;
 }
 
-/* Стили для сообщений об ошибках в форме */
 .error-message {
-    color: red; /* Цвет текста */
-    font-size: 14px; /* Размер шрифта */
-    margin-top: 5px; /* Отступ сверху */
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
 }
