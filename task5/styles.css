@@ -1,0 +1,143 @@
+/* Общие стили для HTML и body */
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Стили для body */
+body {
+    font-family: cursive, sans-serif; /* Шрифт с запасным вариантом */
+    font-optical-sizing: auto;
+    font-style: normal;
+    color: #004b90; /* Цвет текста */
+    background-color: #d4ebff; /* Фоновый цвет страницы */
+}
+
+/* Стили для основного контейнера */
+main {
+    max-width: 960px; /* Максимальная ширина контейнера */
+    padding: 10px; /* Внутренние отступы */
+    padding-bottom: 40px; /* Отступ снизу */
+    margin: 0 auto; /* Центрирование контейнера */
+    background-color: #d4ebff; /* Фоновый цвет контейнера */
+}
+
+/* Стили для контейнера с классом .change */
+main > .change {
+    display: flex;
+    flex-direction: column; /* Элементы в колонку */
+}
+
+/* Стили для фона */
+.background {
+    background-color: #d4ebff; /* Фоновый цвет */
+}
+
+/* Стили для формы */
+#form {
+    flex: 1; /* Занимает доступное пространство */
+    order: 3; /* Порядок отображения */
+}
+
+/* Медиа-запрос для экранов шире 800px */
+@media screen and (min-width: 800px) {
+    main > .change {
+        flex-direction: column-reverse; /* Элементы в обратном порядке */
+    }
+}
+
+/* Дополнительные стили для формы */
+form {
+    max-width: 500px; /* Максимальная ширина формы */
+    margin: 0 auto; /* Центрирование формы */
+    padding: 20px; /* Внутренние отступы */
+    background-color: #ffffff; /* Фоновый цвет формы */
+    border-radius: 8px; /* Скругление углов */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень */
+}
+
+label {
+    display: block; /* Каждая метка на новой строке */
+    margin-top: 10px; /* Отступ сверху */
+    font-weight: bold; /* Жирный шрифт */
+}
+
+input, select, textarea {
+    width: 100%; /* Ширина на всю доступную ширину */
+    padding: 8px; /* Внутренние отступы */
+    margin-top: 5px; /* Отступ сверху */
+    margin-bottom: 10px; /* Отступ снизу */
+    border: 1px solid #ccc; /* Граница */
+    border-radius: 4px; /* Скругление углов */
+    font-family: cursive, sans-serif; /* Шрифт с запасным вариантом */
+}
+
+input[type="radio"], input[type="checkbox"] {
+    width: auto; /* Автоматическая ширина */
+    margin-right: 10px; /* Отступ справа */
+}
+
+input[type="submit"] {
+    background-color: #004b90; /* Цвет фона */
+    color: white; /* Цвет текста */
+    border: none; /* Убираем границу */
+    cursor: pointer; /* Курсор в виде указателя */
+    padding: 10px 20px; /* Внутренние отступы */
+    border-radius: 4px; /* Скругление углов */
+    font-size: 16px; /* Размер шрифта */
+}
+
+input[type="submit"]:hover {
+    background-color: #003366; /* Цвет фона при наведении */
+}
+
+/* Стили для сообщений */
+#messages {
+    margin-bottom: 20px; /* Отступ снизу */
+    padding: 10px; /* Внутренние отступы */
+    border-radius: 4px; /* Скругление углов */
+}
+
+.error {
+    border: 2px solid red;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+#messages .error {
+    color: #c62828;
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+#messages .success {
+    color: #2e7d32;
+    background-color: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+/* Стили для выбранных значений в select */
+select option:checked {
+    background-color: #004b90; /* Цвет фона для выбранных элементов */
+    color: white; /* Цвет текста */
+}
+
+/* Стили для текстовых полей с ошибками */
+input.error, select.error, textarea.error {
+    border-color: red; /* Красная граница для полей с ошибками */
+}
+
+/* Стили для сообщений об ошибках в форме */
+.error-message {
+    color: red; /* Цвет текста */
+    font-size: 14px; /* Размер шрифта */
+    margin-top: 5px; /* Отступ сверху */
+}
