@@ -1,0 +1,91 @@
+/* Общие стили для HTML и body */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: cursive, sans-serif; /* Шрифт с запасным вариантом */
+    background-color: #d4ebff; /* Фоновый цвет страницы */
+    color: #004b90; /* Цвет текста */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Основной контейнер для формы входа */
+.login-container {
+    background-color: #ffffff; /* Фоновый цвет формы */
+    padding: 30px;
+    border-radius: 8px; /* Скругление углов */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень */
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Заголовок формы */
+.login-container h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #004b90; /* Цвет заголовка */
+}
+
+/* Поля ввода */
+.login-container input[type="text"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc; /* Граница */
+    border-radius: 4px; /* Скругление углов */
+    font-family: cursive, sans-serif; /* Шрифт с запасным вариантом */
+    font-size: 16px;
+    color: #004b90; /* Цвет текста */
+    background-color: #f9f9f9; /* Фоновый цвет поля ввода */
+}
+
+/* Поля ввода при фокусе */
+.login-container input[type="text"]:focus,
+.login-container input[type="password"]:focus {
+    border-color: #004b90; /* Цвет границы при фокусе */
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 75, 144, 0.5); /* Тень при фокусе */
+}
+
+/* Кнопка входа */
+.login-container input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #004b90; /* Цвет фона кнопки */
+    color: white; /* Цвет текста кнопки */
+    border: none;
+    border-radius: 4px; /* Скругление углов */
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Плавное изменение цвета */
+}
+
+/* Кнопка входа при наведении */
+.login-container input[type="submit"]:hover {
+    background-color: #003366; /* Цвет фона при наведении */
+}
+
+/* Сообщения об ошибках */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* Ссылка на главную страницу */
+.back-link {
+    display: block;
+    margin-top: 15px;
+    color: #004b90; /* Цвет ссылки */
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* Ссылка при наведении */
+.back-link:hover {
+    text-decoration: underline;
+}
