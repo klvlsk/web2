@@ -95,7 +95,16 @@ $language_stats = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td><?= htmlspecialchars($app['birth_date']) ?></td>
                     <td><?= $app['gender'] == 'male' ? 'Мужской' : 'Женский' ?></td>
                     <td><?= htmlspecialchars($app['languages_list'] ?? 'Не указано') ?></td>
-                    <td><?= htmlspecialchars(substr($app['biography'], 0, 50)) ?>...</td>
+                    <td>
+                        <?php 
+                        $bio = htmlspecialchars($app['biography']);
+                        if (strlen($bio) > 50) {
+                            echo substr($bio, 0, 50) . '...';
+                        } else {
+                            echo $bio;
+                        }
+                        ?>
+                    </td>
                     <td><?= $app['contract_agreed'] ? 'Да' : 'Нет' ?></td>
                     <td>
                         <form method="POST" style="display:inline;">
