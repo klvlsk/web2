@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $messages = [];
     if (!empty($_COOKIE['save'])) {
         setcookie('save', '', time() - 3600);
-        $messages[] = 'Спасибо, результаты сохранены.';
         if (!empty($_COOKIE['pass'])) {
             $messages[] = sprintf('Вы можете <a href="login.php">войти</a> с логином <strong>%s</strong> и паролем <strong>%s</strong> для изменения данных.',
                 strip_tags($_COOKIE['login']),
@@ -150,23 +149,42 @@ try {
             $stmt->execute([$_SESSION['uid'], $language_id]);
         }
     } else {
-        $login = uniqid();
-        $pass = substr(md5(rand()), 0, 8);
-        $pass_hash = md5($pass);
-
+        // Проверяем, не были ли уже сгенерированы учетные данные для этого набора данных
+        $stmt = $db->prepare("SELECT login, pass FROM application WHERE email = ? AND phone = ?");
+        $stmt->execute([$_POST['email'], $_POST['phone']]);
+        $existing_user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if ($existing_user) {
+            // Если пользователь с таким email и телефоном уже существует, используем существующие данные
+            $login = $existing_user['login'];
+            $pass_hash = $existing_user['pass'];
+            $messages[] = 'Вы уже регистрировались ранее. Используйте ранее выданные учетные данные.';
+        } else {
+            // Если пользователь новый, генерируем новые учетные данные
+            $login = uniqid();
+            $pass = substr(md5(rand()), 0, 8);
+            $pass_hash = md5($pass);
+            $messages[] = 'Спасибо, результаты сохранены.';
+            $messages[] = sprintf('Вы можете <a href="login.php">войти</a> с логином <strong>%s</strong> и паролем <strong>%s</strong> для изменения данных.',
+                $login, $pass);
+        }
+    
         $stmt = $db->prepare("INSERT INTO application (full_name, phone, email, birth_date, gender, biography, contract_agreed, login, pass) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $_POST['fio'], $_POST['phone'], $_POST['email'], $_POST['birth_date'], $_POST['gender'], $_POST['biography'], $_POST['contract_agreed'] ? 1 : 0, $login, $pass_hash
         ]);
         $application_id = $db->lastInsertId();
-
+    
         foreach ($_POST['languages'] as $language_id) {
             $stmt = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
             $stmt->execute([$application_id, $language_id]);
         }
-
-        setcookie('login', $login);
-        setcookie('pass', $pass);
+    
+        if (!isset($existing_user)) {
+            setcookie('login', $login, time() + 24 * 60 * 60);
+            setcookie('pass', $pass, time() + 24 * 60 * 60);
+        }
+        setcookie('save', '1', time() + 24 * 60 * 60);
     }
 } catch (PDOException $e) {
     print('Ошибка при сохранении данных: ' . $e->getMessage());
