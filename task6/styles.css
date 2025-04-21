@@ -42,7 +42,8 @@ main > .change {
 form {
     max-width: 500px;
     margin: 0 auto;
-    padding: 0px;
+    padding: 20px;
+    background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -127,86 +128,4 @@ input.error, select.error, textarea.error {
     color: red;
     font-size: 14px;
     margin-top: 5px;
-}
-
-/* Новые стили для админ-панели */
-.admin-container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.edit-container {
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
-    padding: 12px;
-    text-align: left;
-}
-
-th {
-    background-color: #f2f2f2;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
-    background-color: #f1f1f1;
-}
-
-button {
-    padding: 8px 12px;
-    margin: 2px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #45a049;
-}
-
-button[type="submit"][name="delete"] {
-    background-color: #f44336;
-}
-
-button[type="submit"][name="delete"]:hover {
-    background-color: #d32f2f;
-}
-
-.cancel-button {
-    display: inline-block;
-    padding: 8px 12px;
-    background-color: #ccc;
-    color: #333;
-    text-decoration: none;
-    border-radius: 4px;
-    margin-left: 10px;
-}
-
-.cancel-button:hover {
-    background-color: #bbb;
 }
