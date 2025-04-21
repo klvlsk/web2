@@ -42,7 +42,7 @@ main > .change {
 form {
     max-width: 500px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 1px;
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
