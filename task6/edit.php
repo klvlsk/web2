@@ -131,7 +131,7 @@ $all_languages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
     <div class="edit-container">
-        <h1>Редактирование пользователя #<?= htmlspecialchars($edit_id) ?></h1>
+        <h2>Редактирование пользователя #<?= htmlspecialchars($edit_id) ?></h2>
         
         <?php if (!empty($errors)): ?>
             <div class="error-message">
