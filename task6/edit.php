@@ -127,7 +127,7 @@ $all_languages = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Редактирование пользователя</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style3.css">
 </head>
 <body>
     <div class="edit-container">
