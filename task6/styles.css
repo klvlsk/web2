@@ -1,6 +1,8 @@
 html, body {
     margin: 0;
     padding: 0;
+    width: 100%;
+    overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
 }
 
 body {
@@ -9,6 +11,7 @@ body {
     font-style: normal;
     color: #004b90;
     background-color: #d4ebff;
+    min-height: 100vh;
 }
 
 main {
@@ -131,27 +134,30 @@ input.error, select.error, textarea.error {
 
 /* Новые стили для админ-панели */
 .admin-container {
-    max-width: 1200px;
+    max-width: 95%;
     margin: 20px auto;
     padding: 20px;
     background: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 .edit-container {
-    max-width: 600px;
+    max-width: 95%;
     margin: 20px auto;
     padding: 20px;
     background: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     margin: 20px 0;
+    table-layout: auto;
 }
 
 table, th, td {
@@ -159,12 +165,16 @@ table, th, td {
 }
 
 th, td {
-    padding: 12px;
+    padding: 8px 12px;
     text-align: left;
+    word-wrap: break-word;
+    max-width: 200px;
 }
 
 th {
     background-color: #f2f2f2;
+    position: sticky;
+    top: 0;
 }
 
 tr:nth-child(even) {
@@ -176,13 +186,15 @@ tr:hover {
 }
 
 button {
-    padding: 8px 12px;
+    padding: 6px 10px;
     margin: 2px;
     background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
 }
 
 button:hover {
