@@ -22,7 +22,9 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
                     <?php if (!empty($messages)): ?>
                         <div id="messages">
                             <?php foreach ($messages as $message): ?>
-                                <div class="success"><?= htmlspecialchars($message) ?></div>
+                                <div class="success">
+                                    <?= $message['html'] ?? htmlspecialchars($message) ?>
+                                </div>
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>

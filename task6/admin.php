@@ -73,11 +73,22 @@ function getLanguageStatistics() {
 
 <?php
 function renderApplicationsTable($applications) {
-    $html = '<table><thead><tr>
-        <th>ID</th><th>ФИО</th><th>Телефон</th><th>Email</th>
-        <th>Дата рождения</th><th>Пол</th><th>Языки</th>
-        <th>Биография</th><th>Контракт</th><th>Действия</th>
-    </tr></thead><tbody>';
+    $html = '<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>ФИО</th>
+        <th>Телефон</th>
+        <th>Email</th>
+        <th>Дата рождения</th>
+        <th>Пол</th>
+        <th>Языки</th>
+        <th>Биография</th>
+        <th>Контракт</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>';
 
     foreach ($applications as $app) {
         $html .= '<tr>
