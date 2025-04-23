@@ -41,9 +41,11 @@ function handlePostRequest(DatabaseRepository $db) {
     $values = getFormValues();
     $errors = Validator::validateUserForm($values);
     
+    // Убедимся, что $errors - массив
+    $_SESSION['errors'] = is_array($errors) ? $errors : [];
+    $_SESSION['values'] = $values;
+    
     if (!empty($errors)) {
-        $_SESSION['errors'] = $errors;
-        $_SESSION['values'] = $values;
         header('Location: index.php');
         exit();
     }

@@ -45,27 +45,30 @@ function renderTable(array $data, array $columns, array $actions = []): string {
 }
 
 function renderFormField(string $type, string $name, string $label, array $errors = [], array $values = [], array $attrs = []): string {
-    $html = '<label>' . htmlspecialchars($label) . ':</label>';
-    $html .= '<input type="' . htmlspecialchars($type) . '" name="' . htmlspecialchars($name) . '" ';
-    
-    if (!empty($attrs)) {
-        foreach ($attrs as $attr => $val) {
-            $html .= htmlspecialchars($attr) . '="' . htmlspecialchars($val) . '" ';
-        }
+    // Добавляем защиту от неверного типа
+    if (!is_array($errors)) {
+        $errors = [];
     }
     
+    $html = '<label>'.htmlspecialchars($label).':</label>';
+    $html .= '<input type="'.htmlspecialchars($type).'" name="'.htmlspecialchars($name).'" ';
+    
+    // Добавляем атрибуты
+    foreach ($attrs as $attr => $val) {
+        $html .= htmlspecialchars($attr).'="'.htmlspecialchars($val).'" ';
+    }
+    
+    // Добавляем класс ошибки если есть
     if (!empty($errors[$name])) {
         $html .= 'class="error" ';
     }
     
-    if (isset($values[$name])) {
-        $html .= 'value="' . htmlspecialchars($values[$name]) . '"';
-    }
+    // Добавляем значение
+    $html .= 'value="'.htmlspecialchars($values[$name] ?? '').'">';
     
-    $html .= '>';
-    
+    // Выводим сообщение об ошибке
     if (!empty($errors[$name])) {
-        $html .= '<div class="error-message">' . htmlspecialchars($errors[$name]) . '</div>';
+        $html .= '<div class="error-message">'.htmlspecialchars($errors[$name]).'</div>';
     }
     
     return $html;

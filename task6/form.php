@@ -2,7 +2,8 @@
 require_once 'DatabaseRepository.php';
 require_once 'template_helpers.php';
 
-$errors = $_SESSION['errors'] ?? [];
+// Убедимся, что $errors - всегда массив
+$errors = is_array($_SESSION['errors'] ?? null) ? $_SESSION['errors'] : [];
 $values = $_SESSION['values'] ?? [];
 $messages = $_SESSION['messages'] ?? [];
 
@@ -32,10 +33,11 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
                         </div>
                     <?php endif; ?>
 
-                    <?= renderFormField('text', 'fio', 'ФИО', '[A-Za-zА-Яа-я\s]{1,150}', 150, $errors, $values) ?>
-                    <?= renderFormField('tel', 'phone', 'Телефон', '\+7\d{10}', null, $errors, $values) ?>
-                    <?= renderFormField('email', 'email', 'Email', null, null, $errors, $values) ?>
-                    <?= renderFormField('date', 'birth_date', 'Дата рождения', null, null, $errors, $values) ?>
+                    <!-- Исправленные вызовы renderFormField() -->
+                    <?= renderFormField('text', 'fio', 'ФИО', $errors, $values, ['required' => '', 'pattern' => '[A-Za-zА-Яа-я\s]{1,150}', 'maxlength' => '150']) ?>
+                    <?= renderFormField('tel', 'phone', 'Телефон', $errors, $values, ['required' => '', 'pattern' => '\+7\d{10}']) ?>
+                    <?= renderFormField('email', 'email', 'Email', $errors, $values, ['required' => '']) ?>
+                    <?= renderFormField('date', 'birth_date', 'Дата рождения', $errors, $values, ['required' => '']) ?>
 
                     <label>Пол:</label>
                     <?= renderRadioField('gender', 'male', 'Мужской', $values) ?>
