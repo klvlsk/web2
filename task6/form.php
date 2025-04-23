@@ -50,8 +50,7 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
                     <?= renderError('languages', $errors) ?>
 
                     <label>Биография:</label>
-                    <textarea name="biography" required maxlength="500" <?= !empty($errors['biography']) ? 'class="error"' : '' ?>><?=htmlspecialchars(trim($values['biography'] ?? '')) ?>
-                    </textarea>
+                    <textarea name="biography" required maxlength="500" <?= !empty($errors['biography']) ? 'class="error"' : '' ?>><?=htmlspecialchars(trim($values['biography'] ?? '')) ?></textarea>
                     <?= renderError('biography', $errors) ?>
 
                     <label>

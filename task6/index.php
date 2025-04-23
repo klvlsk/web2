@@ -71,7 +71,6 @@ function loadUserValues() {
     $values['languages'] = !empty($_COOKIE['languages_value']) ? 
         json_decode($_COOKIE['languages_value'], true) : [];
     $values['contract_agreed'] = !empty($_COOKIE['contract_agreed_value']);
-    $values['biography'] = trim($_COOKIE['biography_value'] ?? '');
 
     if (!empty($_SESSION['login'])) {
         $db = getDBConnection();
