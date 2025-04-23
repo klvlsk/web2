@@ -1,22 +1,24 @@
 <?php
-require_once 'db.php';
-require_once 'form_helpers.php';
+require_once 'DatabaseRepository.php';
+require_once 'Validator.php';
+require_once 'template_helpers.php';
 
 session_start();
 header('Content-Type: text/html; charset=UTF-8');
 
+$db = new DatabaseRepository();
+
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-    handleGetRequest();
+    handleGetRequest($db);
 } else {
-    handlePostRequest();
+    handlePostRequest($db);
 }
 
-function handleGetRequest() {
+function handleGetRequest(DatabaseRepository $db) {
     $messages = [];
     if (!empty($_COOKIE['save'])) {
         setcookie('save', '', time() - 3600);
         
-        // Показываем сообщение только если есть и логин, и пароль в куках
         if (!empty($_COOKIE['login']) && !empty($_COOKIE['pass'])) {
             $messages[] = [
                 'html' => 'Вы можете <a href="login.php">войти</a> с логином <strong>' . 
@@ -28,16 +30,16 @@ function handleGetRequest() {
         }
     }
 
-    $values = loadUserValues();
+    $values = loadUserValues($db);
     $_SESSION['values'] = $values;
     $_SESSION['messages'] = $messages;
     
     include('form.php');
 }
 
-function handlePostRequest() {
+function handlePostRequest(DatabaseRepository $db) {
     $values = getFormValues();
-    $errors = validateForm($values);
+    $errors = Validator::validateUserForm($values);
     
     if (!empty($errors)) {
         $_SESSION['errors'] = $errors;
@@ -49,9 +51,10 @@ function handlePostRequest() {
     $isEdit = !empty($_SESSION['login']);
     $userId = $_SESSION['uid'] ?? null;
     
-    $result = saveUserData($values, $isEdit, $userId);
+    $result = $isEdit 
+        ? $db->updateUser($userId, $values)
+        : $db->createUser($values);
     
-    // Всегда устанавливаем куки с логином и паролем
     setcookie('login', $result['login'], time() + 24 * 60 * 60);
     setcookie('pass', $result['pass'], time() + 24 * 60 * 60);
     setcookie('save', '1', time() + 24 * 60 * 60);
@@ -59,14 +62,25 @@ function handlePostRequest() {
     header('Location: index.php');
 }
 
-function loadUserValues() {
+function getFormValues(): array {
+    return [
+        'full_name' => $_POST['fio'] ?? '',
+        'phone' => $_POST['phone'] ?? '',
+        'email' => $_POST['email'] ?? '',
+        'birth_date' => $_POST['birth_date'] ?? '',
+        'gender' => $_POST['gender'] ?? '',
+        'biography' => $_POST['biography'] ?? '',
+        'contract_agreed' => isset($_POST['contract_agreed']),
+        'languages' => $_POST['languages'] ?? []
+    ];
+}
+
+function loadUserValues(DatabaseRepository $db): array {
     $values = [];
     $fields = ['fio', 'phone', 'email', 'birth_date', 'gender', 'biography'];
     
     foreach ($fields as $field) {
-        $values[$field] = isset($_COOKIE[$field.'_value']) 
-            ? trim($_COOKIE[$field.'_value']) 
-            : '';
+        $values[$field] = $_COOKIE[$field.'_value'] ?? '';
         setcookie($field.'_error', '', time() - 3600);
     }
     
@@ -75,11 +89,8 @@ function loadUserValues() {
     $values['contract_agreed'] = !empty($_COOKIE['contract_agreed_value']);
 
     if (!empty($_SESSION['login'])) {
-        $db = getDBConnection();
-        $stmt = $db->prepare("SELECT * FROM application WHERE login = ?");
-        $stmt->execute([$_SESSION['login']]);
-        $user_data = $stmt->fetch();
-
+        $user_data = $db->getUser($_SESSION['uid']);
+        
         if ($user_data) {
             $values = [
                 'fio' => $user_data['full_name'],
@@ -87,13 +98,10 @@ function loadUserValues() {
                 'email' => $user_data['email'],
                 'birth_date' => $user_data['birth_date'],
                 'gender' => $user_data['gender'],
-                'biography' => trim($user_data['biography']),
-                'contract_agreed' => $user_data['contract_agreed']
+                'biography' => $user_data['biography'],
+                'contract_agreed' => $user_data['contract_agreed'],
+                'languages' => $db->getUserLanguages($_SESSION['uid'])
             ];
-
-            $stmt = $db->prepare("SELECT language_id FROM application_languages WHERE application_id = ?");
-            $stmt->execute([$_SESSION['uid']]);
-            $values['languages'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
         }
     }
     

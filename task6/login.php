@@ -1,5 +1,5 @@
 <?php
-require_once 'db.php';
+require_once 'DatabaseRepository.php'; // Заменяем db.php
 
 session_start();
 header('Content-Type: text/html; charset=UTF-8');
@@ -16,17 +16,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 function handleLogin($login, $password) {
-    $db = getDBConnection();
-    $stmt = $db->prepare("SELECT id, pass FROM application WHERE login = ?");
-    $stmt->execute([$login]);
-    $user_data = $stmt->fetch();
-
-    if (!$user_data || md5($password) !== $user_data['pass']) {
+    $db = new DatabaseRepository();
+    $user = $db->checkUserCredentials($login, $password);
+    
+    if (!$user) {
         return 'Неверный логин или пароль.';
     }
 
     $_SESSION['login'] = $login;
-    $_SESSION['uid'] = $user_data['id'];
+    $_SESSION['uid'] = $user['id'];
     header('Location: index.php');
     exit();
 }

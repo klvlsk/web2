@@ -1,8 +1,12 @@
 <?php
-session_start();
-require_once 'db.php';
+require_once 'DatabaseRepository.php';
+require_once 'Validator.php';
+require_once 'template_helpers.php';
 
-validateAdminCredentials();
+session_start();
+
+$db = new DatabaseRepository();
+$db->validateAdminCredentials();
 
 $edit_id = $_SESSION['edit_id'] ?? null;
 if (!$edit_id) {
@@ -10,117 +14,16 @@ if (!$edit_id) {
     exit();
 }
 
-$user_data = getUserData($edit_id);
-$user_languages = getUserLanguages($edit_id);
-
-function validateUserData($data) {
-    $errors = [];
-    
-    if (empty($data['full_name'])) {
-        $errors[] = 'ФИО обязательно для заполнения';
-    }
-    
-    if (empty($data['phone'])) {
-        $errors[] = 'Телефон обязателен для заполнения';
-    } elseif (!preg_match('/^[\d\s\-\(\)\+]+$/', $data['phone'])) {
-        $errors[] = 'Некорректный формат телефона';
-    }
-    
-    if (empty($data['email'])) {
-        $errors[] = 'Email обязателен для заполнения';
-    } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'Некорректный формат email';
-    }
-    
-    if (empty($data['birth_date'])) {
-        $errors[] = 'Дата рождения обязательна для заполнения';
-    }
-    
-    if (empty($data['gender'])) {
-        $errors[] = 'Пол обязателен для выбора';
-    }
-    
-    if (empty($data['languages'])) {
-        $errors[] = 'Необходимо выбрать хотя бы один язык программирования';
-    }
-    
-    if (empty($data['biography'])) {
-        $errors[] = 'Биография обязательна для заполнения';
-    }
-    
-    if (!isset($data['contract_agreed'])) {
-        $errors[] = 'Необходимо согласиться с условиями контракта';
-    }
-    
-    return $errors;
-}
+$user_data = $db->getUser($edit_id);
+$user_languages = $db->getUserLanguages($edit_id);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $errors = validateUserData($_POST);
+    $errors = Validator::validateUserForm($_POST);
     
     if (empty($errors)) {
-        if (updateUserData($edit_id, $_POST)) {
-            header('Location: admin.php');
-            exit();
-        } else {
-            $errors[] = 'Ошибка при обновлении данных';
-        }
-    }
-}
-
-$all_languages = getAllLanguages();
-
-function getUserData($id) {
-    $db = getDBConnection();
-    $stmt = $db->prepare("SELECT * FROM application WHERE id = ?");
-    $stmt->execute([$id]);
-    return $stmt->fetch();
-}
-
-function getUserLanguages($id) {
-    $db = getDBConnection();
-    $stmt = $db->prepare("SELECT language_id FROM application_languages WHERE application_id = ?");
-    $stmt->execute([$id]);
-    return $stmt->fetchAll(PDO::FETCH_COLUMN);
-}
-
-function getAllLanguages() {
-    $db = getDBConnection();
-    $stmt = $db->query("SELECT id, language_name FROM programming_languages");
-    return $stmt->fetchAll();
-}
-
-function updateUserData($id, $data) {
-    $db = getDBConnection();
-    
-    try {
-        $db->beginTransaction();
-        
-        $stmt = $db->prepare("
-            UPDATE application SET 
-            full_name = ?, phone = ?, email = ?, 
-            birth_date = ?, gender = ?, biography = ?, 
-            contract_agreed = ? WHERE id = ?
-        ");
-        $stmt->execute([
-            $data['full_name'], $data['phone'], $data['email'],
-            $data['birth_date'], $data['gender'], $data['biography'],
-            isset($data['contract_agreed']) ? 1 : 0, $id
-        ]);
-
-        $stmt = $db->prepare("DELETE FROM application_languages WHERE application_id = ?");
-        $stmt->execute([$id]);
-
-        foreach ($data['languages'] as $language_id) {
-            $stmt = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
-            $stmt->execute([$id, $language_id]);
-        }
-
-        $db->commit();
-        return true;
-    } catch (PDOException $e) {
-        $db->rollBack();
-        return false;
+        $db->updateUser($edit_id, $_POST);
+        header('Location: admin.php');
+        exit();
     }
 }
 ?>
@@ -146,38 +49,27 @@ function updateUserData($id, $data) {
         <?php endif; ?>
         
         <form method="POST">
-            <label>ФИО:</label>
-            <input type="text" name="full_name" value="<?= htmlspecialchars($user_data['full_name']) ?>" required>
-            
-            <label>Телефон:</label>
-            <input type="tel" name="phone" value="<?= htmlspecialchars($user_data['phone']) ?>" required>
-            
-            <label>Email:</label>
-            <input type="email" name="email" value="<?= htmlspecialchars($user_data['email']) ?>" required>
-            
-            <label>Дата рождения:</label>
-            <input type="date" name="birth_date" value="<?= htmlspecialchars($user_data['birth_date']) ?>" required>
+            <?= renderFormField('text', 'full_name', 'ФИО', $errors ?? [], $user_data, ['required' => '']) ?>
+            <?= renderFormField('tel', 'phone', 'Телефон', $errors ?? [], $user_data, ['required' => '']) ?>
+            <?= renderFormField('email', 'email', 'Email', $errors ?? [], $user_data, ['required' => '']) ?>
+            <?= renderFormField('date', 'birth_date', 'Дата рождения', $errors ?? [], $user_data, ['required' => '']) ?>
             
             <label>Пол:</label>
-            <input type="radio" name="gender" value="male" <?= $user_data['gender'] == 'male' ? 'checked' : '' ?> required> Мужской
-            <input type="radio" name="gender" value="female" <?= $user_data['gender'] == 'female' ? 'checked' : '' ?>> Женский
+            <?= renderRadioField('gender', 'male', 'Мужской', $user_data) ?>
+            <?= renderRadioField('gender', 'female', 'Женский', $user_data) ?>
+            <?= !empty($errors['gender']) ? '<div class="error-message">' . htmlspecialchars($errors['gender']) . '</div>' : '' ?>
             
             <label>Любимый язык программирования:</label>
-            <select name="languages[]" multiple required style="height: 150px;">
-                <?php foreach ($all_languages as $lang): ?>
-                    <option value="<?= $lang['id'] ?>" <?= in_array($lang['id'], $user_languages) ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($lang['language_name']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+            <?= renderSelectLanguages($user_languages) ?>
+            <?= !empty($errors['languages']) ? '<div class="error-message">' . htmlspecialchars($errors['languages']) . '</div>' : '' ?>
             
-            <label>Биография:</label>
-            <textarea name="biography" required><?= htmlspecialchars($user_data['biography']) ?></textarea>
+            <?= renderTextarea('biography', 'Биография', $errors ?? [], $user_data, ['required' => '', 'maxlength' => '500']) ?>
             
             <label>
                 <input type="checkbox" name="contract_agreed" <?= $user_data['contract_agreed'] ? 'checked' : '' ?>>
                 Согласен с контрактом
             </label>
+            <?= !empty($errors['contract_agreed']) ? '<div class="error-message">' . htmlspecialchars($errors['contract_agreed']) . '</div>' : '' ?>
             
             <button type="submit">Сохранить изменения</button>
             <a href="admin.php" class="cancel-button">Отмена</a>

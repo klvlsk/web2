@@ -1,4 +1,7 @@
 <?php
+require_once 'DatabaseRepository.php';
+require_once 'template_helpers.php';
+
 $errors = $_SESSION['errors'] ?? [];
 $values = $_SESSION['values'] ?? [];
 $messages = $_SESSION['messages'] ?? [];
@@ -40,13 +43,7 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
                     <?= renderError('gender', $errors) ?>
 
                     <label>Любимый язык программирования:</label>
-                    <select name="languages[]" multiple required>
-                        <?php foreach (getProgrammingLanguages() as $key => $value): ?>
-                            <option value="<?= $key ?>" <?= in_array($key, $values['languages'] ?? []) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($value) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <?= renderSelectLanguages($values['languages'] ?? []) ?>
                     <?= renderError('languages', $errors) ?>
 
                     <label>Биография:</label>
@@ -66,44 +63,3 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
     </main>
 </body>
 </html>
-
-<?php
-function renderFormField($type, $name, $label, $pattern = null, $maxlength = null, $errors, $values) {
-    $html = '<label>'.$label.':</label>';
-    $html .= '<input type="'.$type.'" name="'.$name.'" required ';
-    
-    if ($pattern) $html .= 'pattern="'.$pattern.'" ';
-    if ($maxlength) $html .= 'maxlength="'.$maxlength.'" ';
-    if (!empty($errors[$name])) $html .= 'class="error" ';
-    
-    $html .= 'value="'.htmlspecialchars($values[$name] ?? '').'">';
-    $html .= renderError($name, $errors);
-    
-    return $html;
-}
-
-function renderRadioField($name, $value, $label, $values) {
-    $checked = ($values[$name] ?? '') === $value ? 'checked' : '';
-    return '<input type="radio" name="'.$name.'" value="'.$value.'" '.$checked.'> '.$label;
-}
-
-function renderError($name, $errors) {
-    return !empty($errors[$name]) ? '<div class="error-message">'.$errors[$name].'</div>' : '';
-}
-
-function getProgrammingLanguages() {
-    return [
-        1 => 'Pascal',
-        2 => 'C',
-        3 => 'C++',
-        4 => 'JavaScript',
-        5 => 'PHP',
-        6 => 'Python',
-        7 => 'Java',
-        8 => 'Haskel',
-        9 => 'Clojure',
-        10 => 'Prolog',
-        11 => 'Scala',
-        12 => 'Go'
-    ];
-}
