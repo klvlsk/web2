@@ -56,7 +56,12 @@ function saveUserData($values, $isEdit = false, $userId = null) {
         $db->beginTransaction();
         
         if ($isEdit && $userId) {
-            // Обновляем данные существующего пользователя
+            // Для существующего пользователя получаем текущие логин и пароль
+            $stmt = $db->prepare("SELECT login, pass FROM application WHERE id = ?");
+            $stmt->execute([$userId]);
+            $user = $stmt->fetch();
+            
+            // Обновляем данные пользователя
             $stmt = $db->prepare("
                 UPDATE application 
                 SET full_name=?, phone=?, email=?, birth_date=?, gender=?, biography=?, contract_agreed=? 
@@ -73,21 +78,10 @@ function saveUserData($values, $isEdit = false, $userId = null) {
                 $userId
             ]);
             
-            // Возвращаем false, чтобы не устанавливать куки с логином/паролем
+            // Возвращаем текущие логин и пароль
             $db->commit();
-            return false;
+            return ['login' => $user['login'], 'pass' => $user['pass']];
         } else {
-            // Проверяем, есть ли уже такой пользователь (по email или телефону)
-            $stmt = $db->prepare("SELECT id, login FROM application WHERE email = ? OR phone = ?");
-            $stmt->execute([$values['email'], $values['phone']]);
-            $existingUser = $stmt->fetch();
-            
-            if ($existingUser) {
-                // Если пользователь уже существует, не возвращаем никаких данных
-                $db->commit();
-                return false;
-            }
-            
             // Создаем нового пользователя
             $login = uniqid();
             $pass = substr(md5(rand()), 0, 8);

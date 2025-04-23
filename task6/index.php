@@ -51,15 +51,10 @@ function handlePostRequest() {
     
     $result = saveUserData($values, $isEdit, $userId);
     
-    if (is_array($result)) {
-        // Устанавливаем куки только для нового пользователя
-        setcookie('login', $result['login'], time() + 24 * 60 * 60);
-        setcookie('pass', $result['pass'], time() + 24 * 60 * 60);
-        setcookie('save', '1', time() + 24 * 60 * 60);
-    } else {
-        // Для существующего пользователя просто устанавливаем флаг сохранения
-        setcookie('save', '1', time() + 24 * 60 * 60);
-    }
+    // Всегда устанавливаем куки с логином и паролем
+    setcookie('login', $result['login'], time() + 24 * 60 * 60);
+    setcookie('pass', $result['pass'], time() + 24 * 60 * 60);
+    setcookie('save', '1', time() + 24 * 60 * 60);
     
     header('Location: index.php');
 }
