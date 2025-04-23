@@ -56,12 +56,15 @@ function saveUserData($values, $isEdit = false, $userId = null) {
         $db->beginTransaction();
         
         if ($isEdit && $userId) {
-            // Для существующего пользователя получаем логин и оригинальный пароль
+            // Для существующего пользователя
             $stmt = $db->prepare("SELECT login, pass FROM application WHERE id = ?");
             $stmt->execute([$userId]);
             $user = $stmt->fetch();
             
-            // Обновляем данные пользователя
+            // Берем первые 8 символов md5-хеша как пароль для отображения
+            $display_pass = substr($user['pass'], 0, 8);
+            
+            // Обновляем данные
             $stmt = $db->prepare("
                 UPDATE application 
                 SET full_name=?, phone=?, email=?, birth_date=?, gender=?, biography=?, contract_agreed=? 
@@ -78,14 +81,12 @@ function saveUserData($values, $isEdit = false, $userId = null) {
                 $userId
             ]);
             
-            // Возвращаем оригинальный пароль (первые 8 символов md5)
-            $original_pass = substr($user['pass'], 0, 8);
             $db->commit();
-            return ['login' => $user['login'], 'pass' => $original_pass];
+            return ['login' => $user['login'], 'pass' => $display_pass];
         } else {
-            // Создаем нового пользователя
+            // Новый пользователь
             $login = uniqid();
-            $pass = substr(md5(rand()), 0, 8); // Генерируем случайный пароль 8 символов
+            $pass = substr(md5(rand()), 0, 8); // Генерируем 8 символов
             $pass_hash = md5($pass);
             
             $stmt = $db->prepare("
@@ -107,7 +108,7 @@ function saveUserData($values, $isEdit = false, $userId = null) {
             
             $userId = $db->lastInsertId();
             
-            // Обновляем языки программирования
+            // Обновляем языки
             $db->prepare("DELETE FROM application_languages WHERE application_id = ?")->execute([$userId]);
             foreach ($values['languages'] as $language_id) {
                 $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)")
