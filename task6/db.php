@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 function getDBConnection() {
     static $db = null;
     if ($db === null) {

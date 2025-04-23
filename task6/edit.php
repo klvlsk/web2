@@ -4,6 +4,11 @@ session_start();
 
 validateAdminCredentials();
 
+if (empty($_SESSION['edit_id'])) {
+    header('Location: admin.php');
+    exit();
+}
+
 $edit_id = $_SESSION['edit_id'] ?? null;
 if (!$edit_id) {
     header('Location: admin.php');
