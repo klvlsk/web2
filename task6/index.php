@@ -44,11 +44,15 @@ function handlePostRequest() {
         exit();
     }
     
-    $result = saveUserData($values);
+    // Если пользователь авторизован - это редактирование, иначе - создание
+    $isEdit = !empty($_SESSION['login']);
+    $userId = $_SESSION['uid'] ?? null;
+    
+    $result = saveUserData($values, $isEdit, $userId);
     
     if ($result === true) {
         setcookie('save', '1', time() + 24 * 60 * 60);
-    } elseif (is_array($result)) {
+    } elseif (is_array($result)) { // Только при создании нового пользователя
         setcookie('login', $result['login'], time() + 24 * 60 * 60);
         setcookie('pass', $result['pass'], time() + 24 * 60 * 60);
         setcookie('save', '1', time() + 24 * 60 * 60);

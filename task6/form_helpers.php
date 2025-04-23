@@ -56,35 +56,58 @@ function saveUserData($values, $isEdit = false, $userId = null) {
         $db->beginTransaction();
         
         if ($isEdit && $userId) {
-            // Update existing user
-            $stmt = $db->prepare("UPDATE application SET full_name=?, phone=?, email=?, birth_date=?, gender=?, biography=?, contract_agreed=? WHERE id=?");
+            // Обновляем существующего пользователя, НЕ меняя пароль
+            $stmt = $db->prepare("
+                UPDATE application 
+                SET full_name=?, phone=?, email=?, birth_date=?, gender=?, biography=?, contract_agreed=? 
+                WHERE id=?
+            ");
             $stmt->execute([
-                $values['fio'], $values['phone'], $values['email'], $values['birth_date'], 
-                $values['gender'], $values['biography'], $values['contract_agreed'] ? 1 : 0, $userId
+                $values['fio'], 
+                $values['phone'], 
+                $values['email'], 
+                $values['birth_date'], 
+                $values['gender'], 
+                $values['biography'], 
+                $values['contract_agreed'] ? 1 : 0, 
+                $userId
             ]);
             
+            // Удаляем старые языки и добавляем новые
             $stmt = $db->prepare("DELETE FROM application_languages WHERE application_id=?");
             $stmt->execute([$userId]);
         } else {
-            // Insert new user
+            // Создаем нового пользователя с новым логином и паролем
             $login = uniqid();
             $pass = substr(md5(rand()), 0, 8);
             $pass_hash = md5($pass);
             
-            $stmt = $db->prepare("INSERT INTO application (full_name, phone, email, birth_date, gender, biography, contract_agreed, login, pass) VALUES (?,?,?,?,?,?,?,?,?)");
+            $stmt = $db->prepare("
+                INSERT INTO application 
+                (full_name, phone, email, birth_date, gender, biography, contract_agreed, login, pass) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
             $stmt->execute([
-                $values['fio'], $values['phone'], $values['email'], $values['birth_date'], 
-                $values['gender'], $values['biography'], $values['contract_agreed'] ? 1 : 0, $login, $pass_hash
+                $values['fio'], 
+                $values['phone'], 
+                $values['email'], 
+                $values['birth_date'], 
+                $values['gender'], 
+                $values['biography'], 
+                $values['contract_agreed'] ? 1 : 0, 
+                $login, 
+                $pass_hash
             ]);
             
             $userId = $db->lastInsertId();
             
+            // Возвращаем логин и пароль только при создании нового пользователя
             return ['login' => $login, 'pass' => $pass];
         }
         
-        // Save languages
+        // Сохраняем языки программирования
         foreach ($values['languages'] as $language_id) {
-            $stmt = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?,?)");
+            $stmt = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
             $stmt->execute([$userId, $language_id]);
         }
         
