@@ -1,5 +1,6 @@
 <?php
 require_once 'db.php';
+session_start();
 
 validateAdminCredentials();
 
@@ -116,7 +117,14 @@ function renderApplicationsTable($applications) {
 }
 
 function renderLanguageStats($stats) {
-    $html = '<table><thead><tr><th>Язык</th><th>Количество пользователей</th></tr></thead><tbody>';
+    $html = '<table>
+    <thead>
+    <tr>
+    <th>Язык</th>
+    <th>Количество пользователей</th>
+    </tr>
+    </thead>
+    <tbody>';
     
     foreach ($stats as $stat) {
         $html .= '<tr>
