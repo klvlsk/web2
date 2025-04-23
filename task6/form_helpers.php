@@ -56,8 +56,8 @@ function saveUserData($values, $isEdit = false, $userId = null) {
         $db->beginTransaction();
         
         if ($isEdit && $userId) {
-            // Для существующего пользователя получаем только логин
-            $stmt = $db->prepare("SELECT login FROM application WHERE id = ?");
+            // Для существующего пользователя получаем логин и оригинальный пароль
+            $stmt = $db->prepare("SELECT login, pass FROM application WHERE id = ?");
             $stmt->execute([$userId]);
             $user = $stmt->fetch();
             
@@ -78,13 +78,14 @@ function saveUserData($values, $isEdit = false, $userId = null) {
                 $userId
             ]);
             
-            // Возвращаем логин и фиксированный пароль 'password'
+            // Возвращаем оригинальный пароль (первые 8 символов md5)
+            $original_pass = substr($user['pass'], 0, 8);
             $db->commit();
-            return ['login' => $user['login'], 'pass' => 'password'];
+            return ['login' => $user['login'], 'pass' => $original_pass];
         } else {
             // Создаем нового пользователя
             $login = uniqid();
-            $pass = 'password'; // Фиксированный пароль
+            $pass = substr(md5(rand()), 0, 8); // Генерируем случайный пароль 8 символов
             $pass_hash = md5($pass);
             
             $stmt = $db->prepare("
