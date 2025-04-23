@@ -49,15 +49,15 @@ function validateForm($values) {
     return $errors;
 }
 
-function saveUserData($values, $isEdit = false, $userId = null) {
+ffunction saveUserData($values, $isEdit = false, $userId = null) {
     $db = getDBConnection();
     
     try {
         $db->beginTransaction();
         
         if ($isEdit && $userId) {
-            // Для существующего пользователя получаем текущие логин и пароль
-            $stmt = $db->prepare("SELECT login, pass FROM application WHERE id = ?");
+            // Для существующего пользователя получаем только логин
+            $stmt = $db->prepare("SELECT login FROM application WHERE id = ?");
             $stmt->execute([$userId]);
             $user = $stmt->fetch();
             
@@ -78,13 +78,13 @@ function saveUserData($values, $isEdit = false, $userId = null) {
                 $userId
             ]);
             
-            // Возвращаем текущие логин и пароль
+            // Возвращаем логин и фиксированный пароль 'password'
             $db->commit();
-            return ['login' => $user['login'], 'pass' => $user['pass']];
+            return ['login' => $user['login'], 'pass' => 'password'];
         } else {
             // Создаем нового пользователя
             $login = uniqid();
-            $pass = substr(md5(rand()), 0, 8);
+            $pass = 'password'; // Фиксированный пароль
             $pass_hash = md5($pass);
             
             $stmt = $db->prepare("
