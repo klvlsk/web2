@@ -62,7 +62,9 @@ function loadUserValues() {
     $fields = ['fio', 'phone', 'email', 'birth_date', 'gender', 'biography'];
     
     foreach ($fields as $field) {
-        $values[$field] = $_COOKIE[$field.'_value'] ?? '';
+        $values[$field] = isset($_COOKIE[$field.'_value']) 
+            ? trim($_COOKIE[$field.'_value']) 
+            : '';
         setcookie($field.'_error', '', time() - 3600);
     }
     
@@ -84,7 +86,7 @@ function loadUserValues() {
                 'email' => $user_data['email'],
                 'birth_date' => $user_data['birth_date'],
                 'gender' => $user_data['gender'],
-                'biography' => $user_data['biography'],
+                'biography' => trim($user_data['biography']),
                 'contract_agreed' => $user_data['contract_agreed']
             ];
 
