@@ -19,94 +19,45 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
         <form action="index.php" method="POST" novalidate>
             <div class="change">
                 <div id="form">
-                    <?php
-                    if (!empty($messages)) {
-                        print('<div id="messages">');
-                        foreach ($messages as $message) {
-                            print('<div class="success">' . $message . '</div>');
-                        }
-                        print('</div>');
-                    }
-                    ?>
-
-                    <label>ФИО:</label>
-                    <input type="text" name="fio" required pattern="[A-Za-zА-Яа-я\s]{1,150}" maxlength="150" <?php if (!empty($errors['fio'])) {print 'class="error"';} ?> value="<?php echo htmlspecialchars($values['fio'] ?? ''); ?>">
-                    <?php if (!empty($errors['fio'])): ?>
-                        <div class="error-message"><?php echo $errors['fio']; ?></div>
+                    <?php if (!empty($messages)): ?>
+                        <div id="messages">
+                            <?php foreach ($messages as $message): ?>
+                                <div class="success"><?= htmlspecialchars($message) ?></div>
+                            <?php endforeach; ?>
+                        </div>
                     <?php endif; ?>
-                    <br>
 
-                    <label>Телефон:</label>
-                    <input type="tel" name="phone" required pattern="\+7\d{10}" <?php if (!empty($errors['phone'])) {print 'class="error"';} ?> value="<?php echo htmlspecialchars($values['phone'] ?? ''); ?>">
-                    <?php if (!empty($errors['phone'])): ?>
-                        <div class="error-message"><?php echo $errors['phone']; ?></div>
-                    <?php endif; ?>
-                    <br>
-
-                    <label>Email:</label>
-                    <input type="email" name="email" required <?php if (!empty($errors['email'])) {print 'class="error"';} ?> value="<?php echo htmlspecialchars($values['email'] ?? ''); ?>">
-                    <?php if (!empty($errors['email'])): ?>
-                        <div class="error-message"><?php echo $errors['email']; ?></div>
-                    <?php endif; ?>
-                    <br>
-
-                    <label>Дата рождения:</label>
-                    <input type="date" name="birth_date" required <?php if (!empty($errors['birth_date'])) {print 'class="error"';} ?> value="<?php echo htmlspecialchars($values['birth_date'] ?? ''); ?>">
-                    <?php if (!empty($errors['birth_date'])): ?>
-                        <div class="error-message"><?php echo $errors['birth_date']; ?></div>
-                    <?php endif; ?>
-                    <br>
+                    <?= renderFormField('text', 'fio', 'ФИО', '[A-Za-zА-Яа-я\s]{1,150}', 150, $errors, $values) ?>
+                    <?= renderFormField('tel', 'phone', 'Телефон', '\+7\d{10}', null, $errors, $values) ?>
+                    <?= renderFormField('email', 'email', 'Email', null, null, $errors, $values) ?>
+                    <?= renderFormField('date', 'birth_date', 'Дата рождения', null, null, $errors, $values) ?>
 
                     <label>Пол:</label>
-                    <input type="radio" name="gender" value="male" required <?php if (($values['gender'] ?? '') === 'male') {print 'checked';} ?>> Мужской
-                    <input type="radio" name="gender" value="female" <?php if (($values['gender'] ?? '') === 'female') {print 'checked';} ?>> Женский
-                    <?php if (!empty($errors['gender'])): ?>
-                        <div class="error-message"><?php echo $errors['gender']; ?></div>
-                    <?php endif; ?>
-                    <br>
+                    <?= renderRadioField('gender', 'male', 'Мужской', $values) ?>
+                    <?= renderRadioField('gender', 'female', 'Женский', $values) ?>
+                    <?= renderError('gender', $errors) ?>
 
                     <label>Любимый язык программирования:</label>
                     <select name="languages[]" multiple required>
-                        <?php
-                        $languages = [
-                            1 => 'Pascal',
-                            2 => 'C',
-                            3 => 'C++',
-                            4 => 'JavaScript',
-                            5 => 'PHP',
-                            6 => 'Python',
-                            7 => 'Java',
-                            8 => 'Haskel',
-                            9 => 'Clojure',
-                            10 => 'Prolog',
-                            11 => 'Scala',
-                            12 => 'Go'
-                        ];
-                        foreach ($languages as $key => $value) {
-                            $selected = in_array($key, $values['languages'] ?? []) ? 'selected' : '';
-                            echo "<option value=\"$key\" $selected>$value</option>";
-                        }
-                        ?>
+                        <?php foreach (getProgrammingLanguages() as $key => $value): ?>
+                            <option value="<?= $key ?>" <?= in_array($key, $values['languages'] ?? []) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($value) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
-                    <?php if (!empty($errors['languages'])): ?>
-                        <div class="error-message"><?php echo $errors['languages']; ?></div>
-                    <?php endif; ?>
-                    <br>
+                    <?= renderError('languages', $errors) ?>
 
                     <label>Биография:</label>
-                    <textarea name="biography" required maxlength="500" <?php if (!empty($errors['biography'])) {print 'class="error"';} ?>><?php echo htmlspecialchars($values['biography'] ?? ''); ?></textarea>
-                    <?php if (!empty($errors['biography'])): ?>
-                        <div class="error-message"><?php echo $errors['biography']; ?></div>
-                    <?php endif; ?>
-                    <br>
+                    <textarea name="biography" required maxlength="500" <?= !empty($errors['biography']) ? 'class="error"' : '' ?>>
+                        <?= htmlspecialchars($values['biography'] ?? '') ?>
+                    </textarea>
+                    <?= renderError('biography', $errors) ?>
 
                     <label>
-                        <input type="checkbox" name="contract_agreed" required <?php if (!empty($values['contract_agreed'])) {print 'checked';} ?>> С контрактом ознакомлен(а)
+                        <input type="checkbox" name="contract_agreed" required <?= !empty($values['contract_agreed']) ? 'checked' : '' ?>>
+                        С контрактом ознакомлен(а)
                     </label>
-                    <?php if (!empty($errors['contract_agreed'])): ?>
-                        <div class="error-message"><?php echo $errors['contract_agreed']; ?></div>
-                    <?php endif; ?>
-                    <br>
+                    <?= renderError('contract_agreed', $errors) ?>
 
                     <input type="submit" value="Сохранить">
                 </div>
@@ -115,3 +66,44 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
     </main>
 </body>
 </html>
+
+<?php
+function renderFormField($type, $name, $label, $pattern = null, $maxlength = null, $errors, $values) {
+    $html = '<label>'.$label.':</label>';
+    $html .= '<input type="'.$type.'" name="'.$name.'" required ';
+    
+    if ($pattern) $html .= 'pattern="'.$pattern.'" ';
+    if ($maxlength) $html .= 'maxlength="'.$maxlength.'" ';
+    if (!empty($errors[$name])) $html .= 'class="error" ';
+    
+    $html .= 'value="'.htmlspecialchars($values[$name] ?? '').'">';
+    $html .= renderError($name, $errors);
+    
+    return $html;
+}
+
+function renderRadioField($name, $value, $label, $values) {
+    $checked = ($values[$name] ?? '') === $value ? 'checked' : '';
+    return '<input type="radio" name="'.$name.'" value="'.$value.'" '.$checked.'> '.$label;
+}
+
+function renderError($name, $errors) {
+    return !empty($errors[$name]) ? '<div class="error-message">'.$errors[$name].'</div>' : '';
+}
+
+function getProgrammingLanguages() {
+    return [
+        1 => 'Pascal',
+        2 => 'C',
+        3 => 'C++',
+        4 => 'JavaScript',
+        5 => 'PHP',
+        6 => 'Python',
+        7 => 'Java',
+        8 => 'Haskel',
+        9 => 'Clojure',
+        10 => 'Prolog',
+        11 => 'Scala',
+        12 => 'Go'
+    ];
+}

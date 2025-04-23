@@ -1,124 +1,85 @@
 <?php
-session_start();
 require_once 'db.php';
 
-// Проверка авторизации администратора
-if (empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) {
-    header('HTTP/1.1 401 Unauthorized');
-    header('WWW-Authenticate: Basic realm="Admin Panel"');
-    echo '<h1>401 Требуется авторизация</h1>';
-    exit();
-}
+validateAdminCredentials();
 
-// Проверка учетных данных администратора
-$stmt = $db->prepare("SELECT * FROM admin_users WHERE login = ?");
-$stmt->execute([$_SERVER['PHP_AUTH_USER']]);
-$admin = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$admin || md5($_SERVER['PHP_AUTH_PW']) !== $admin['password_hash']) {
-    header('HTTP/1.1 401 Unauthorized');
-    header('WWW-Authenticate: Basic realm="Admin Panel"');
-    echo '<h1>401 Неверные учетные данные</h1>';
-    exit();
-}
-
-// Получение данных пользователя для редактирования
 $edit_id = $_SESSION['edit_id'] ?? null;
 if (!$edit_id) {
     header('Location: admin.php');
     exit();
 }
 
-$stmt = $db->prepare("SELECT * FROM application WHERE id = ?");
-$stmt->execute([$edit_id]);
-$user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+$user_data = getUserData($edit_id);
+$user_languages = getUserLanguages($edit_id);
 
-if (!$user_data) {
-    header('Location: admin.php');
-    exit();
-}
-
-$stmt = $db->prepare("SELECT language_id FROM application_languages WHERE application_id = ?");
-$stmt->execute([$edit_id]);
-$user_languages = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-// Обработка формы редактирования
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $errors = [];
+    $errors = validateUserData($_POST);
     
-    // Валидация данных
-    if (empty($_POST['full_name']) || !preg_match('/^[A-Za-zА-Яа-я\s]{1,150}$/u', $_POST['full_name'])) {
-        $errors[] = 'Неверное ФИО';
-    }
-    if (empty($_POST['phone']) || !preg_match('/^\+7\d{10}$/', $_POST['phone'])) {
-        $errors[] = 'Неверный телефон';
-    }
-    if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'Неверный email';
-    }
-    if (empty($_POST['birth_date']) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $_POST['birth_date'])) {
-        $errors[] = 'Неверная дата рождения';
-    }
-    if (empty($_POST['gender']) || !in_array($_POST['gender'], ['male', 'female'])) {
-        $errors[] = 'Не указан пол';
-    }
-    if (empty($_POST['languages']) || !is_array($_POST['languages'])) {
-        $errors[] = 'Не выбраны языки программирования';
-    }
-    if (empty(trim($_POST['biography'])) || strlen($_POST['biography']) > 500) {
-        $errors[] = 'Неверная биография';
-    }
-
     if (empty($errors)) {
-        try {
-            $db->beginTransaction();
-            
-            // Обновление основной информации
-            $stmt = $db->prepare("
-                UPDATE application SET 
-                full_name = ?, 
-                phone = ?, 
-                email = ?, 
-                birth_date = ?, 
-                gender = ?, 
-                biography = ?, 
-                contract_agreed = ? 
-                WHERE id = ?
-            ");
-            $stmt->execute([
-                $_POST['full_name'],
-                $_POST['phone'],
-                $_POST['email'],
-                $_POST['birth_date'],
-                $_POST['gender'],
-                $_POST['biography'],
-                isset($_POST['contract_agreed']) ? 1 : 0,
-                $edit_id
-            ]);
-
-            // Удаление старых языков
-            $stmt = $db->prepare("DELETE FROM application_languages WHERE application_id = ?");
-            $stmt->execute([$edit_id]);
-
-            // Добавление новых языков
-            foreach ($_POST['languages'] as $language_id) {
-                $stmt = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
-                $stmt->execute([$edit_id, $language_id]);
-            }
-
-            $db->commit();
+        if (updateUserData($edit_id, $_POST)) {
             header('Location: admin.php');
             exit();
-        } catch (PDOException $e) {
-            $db->rollBack();
-            $errors[] = 'Ошибка при обновлении данных: ' . $e->getMessage();
+        } else {
+            $errors[] = 'Ошибка при обновлении данных';
         }
     }
 }
 
-// Получение списка всех языков
-$stmt = $db->query("SELECT id, language_name FROM programming_languages");
-$all_languages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$all_languages = getAllLanguages();
+
+function getUserData($id) {
+    $db = getDBConnection();
+    $stmt = $db->prepare("SELECT * FROM application WHERE id = ?");
+    $stmt->execute([$id]);
+    return $stmt->fetch();
+}
+
+function getUserLanguages($id) {
+    $db = getDBConnection();
+    $stmt = $db->prepare("SELECT language_id FROM application_languages WHERE application_id = ?");
+    $stmt->execute([$id]);
+    return $stmt->fetchAll(PDO::FETCH_COLUMN);
+}
+
+function getAllLanguages() {
+    $db = getDBConnection();
+    $stmt = $db->query("SELECT id, language_name FROM programming_languages");
+    return $stmt->fetchAll();
+}
+
+function updateUserData($id, $data) {
+    $db = getDBConnection();
+    
+    try {
+        $db->beginTransaction();
+        
+        $stmt = $db->prepare("
+            UPDATE application SET 
+            full_name = ?, phone = ?, email = ?, 
+            birth_date = ?, gender = ?, biography = ?, 
+            contract_agreed = ? WHERE id = ?
+        ");
+        $stmt->execute([
+            $data['full_name'], $data['phone'], $data['email'],
+            $data['birth_date'], $data['gender'], $data['biography'],
+            isset($data['contract_agreed']) ? 1 : 0, $id
+        ]);
+
+        $stmt = $db->prepare("DELETE FROM application_languages WHERE application_id = ?");
+        $stmt->execute([$id]);
+
+        foreach ($data['languages'] as $language_id) {
+            $stmt = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
+            $stmt->execute([$id, $language_id]);
+        }
+
+        $db->commit();
+        return true;
+    } catch (PDOException $e) {
+        $db->rollBack();
+        return false;
+    }
+}
 ?>
 
 <!DOCTYPE html>

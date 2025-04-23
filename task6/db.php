@@ -1,27 +1,45 @@
 <?php
-$user = 'u68596';
-$pass = '2859691';
-$db = new PDO('mysql:host=localhost;dbname=u68596', $user, $pass, [
-    PDO::ATTR_PERSISTENT => true,
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-]);
+function getDBConnection() {
+    static $db = null;
+    if ($db === null) {
+        $user = 'u68596';
+        $pass = '2859691';
+        $db = new PDO('mysql:host=localhost;dbname=u68596', $user, $pass, [
+            PDO::ATTR_PERSISTENT => true,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        ]);
+        
+        initDatabase($db);
+    }
+    return $db;
+}
 
-// Создание таблицы администраторов, если её нет
-$db->exec("
-    CREATE TABLE IF NOT EXISTS admin_users (
-        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        login VARCHAR(50) NOT NULL UNIQUE,
-        password_hash VARCHAR(32) NOT NULL,
-        PRIMARY KEY (id)
-    )
-");
+function initDatabase($db) {
+    $stmt = $db->query("SELECT COUNT(*) FROM admin_users");
+    if ($stmt->fetchColumn() == 0) {
+        $stmt = $db->prepare("INSERT INTO admin_users (login, password_hash) VALUES (?, ?)");
+        $stmt->execute(['admin', md5('123')]);
+    }
+}
 
-// Проверка наличия администратора
-$stmt = $db->query("SELECT COUNT(*) FROM admin_users");
-if ($stmt->fetchColumn() == 0) {
-    $default_admin = 'admin';
-    $default_pass = '123';
-    $stmt = $db->prepare("INSERT INTO admin_users (login, password_hash) VALUES (?, ?)");
-    $stmt->execute([$default_admin, md5($default_pass)]);
+function validateAdminCredentials() {
+    if (empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) {
+        header('HTTP/1.1 401 Unauthorized');
+        header('WWW-Authenticate: Basic realm="Admin Panel"');
+        echo '<h1>401 Требуется авторизация</h1>';
+        exit();
+    }
+
+    $db = getDBConnection();
+    $stmt = $db->prepare("SELECT * FROM admin_users WHERE login = ?");
+    $stmt->execute([$_SERVER['PHP_AUTH_USER']]);
+    $admin = $stmt->fetch();
+
+    if (!$admin || md5($_SERVER['PHP_AUTH_PW']) !== $admin['password_hash']) {
+        header('HTTP/1.1 401 Unauthorized');
+        header('WWW-Authenticate: Basic realm="Admin Panel"');
+        echo '<h1>401 Неверные учетные данные</h1>';
+        exit();
+    }
 }
