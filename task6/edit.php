@@ -1,13 +1,8 @@
 <?php
-require_once 'db.php';
 session_start();
+require_once 'db.php';
 
 validateAdminCredentials();
-
-if (empty($_SESSION['edit_id'])) {
-    header('Location: admin.php');
-    exit();
-}
 
 $edit_id = $_SESSION['edit_id'] ?? null;
 if (!$edit_id) {
@@ -17,6 +12,48 @@ if (!$edit_id) {
 
 $user_data = getUserData($edit_id);
 $user_languages = getUserLanguages($edit_id);
+
+function validateUserData($data) {
+    $errors = [];
+    
+    if (empty($data['full_name'])) {
+        $errors[] = 'ФИО обязательно для заполнения';
+    }
+    
+    if (empty($data['phone'])) {
+        $errors[] = 'Телефон обязателен для заполнения';
+    } elseif (!preg_match('/^[\d\s\-\(\)\+]+$/', $data['phone'])) {
+        $errors[] = 'Некорректный формат телефона';
+    }
+    
+    if (empty($data['email'])) {
+        $errors[] = 'Email обязателен для заполнения';
+    } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Некорректный формат email';
+    }
+    
+    if (empty($data['birth_date'])) {
+        $errors[] = 'Дата рождения обязательна для заполнения';
+    }
+    
+    if (empty($data['gender'])) {
+        $errors[] = 'Пол обязателен для выбора';
+    }
+    
+    if (empty($data['languages'])) {
+        $errors[] = 'Необходимо выбрать хотя бы один язык программирования';
+    }
+    
+    if (empty($data['biography'])) {
+        $errors[] = 'Биография обязательна для заполнения';
+    }
+    
+    if (!isset($data['contract_agreed'])) {
+        $errors[] = 'Необходимо согласиться с условиями контракта';
+    }
+    
+    return $errors;
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $errors = validateUserData($_POST);
