@@ -72,52 +72,56 @@ function saveUserData($values, $isEdit = false, $userId = null) {
                 $values['contract_agreed'] ? 1 : 0, 
                 $userId
             ]);
+            
+            // Возвращаем false, чтобы не устанавливать куки с логином/паролем
+            $db->commit();
+            return false;
         } else {
             // Проверяем, есть ли уже такой пользователь (по email или телефону)
-            $stmt = $db->prepare("SELECT id, login, pass FROM application WHERE email = ? OR phone = ?");
+            $stmt = $db->prepare("SELECT id, login FROM application WHERE email = ? OR phone = ?");
             $stmt->execute([$values['email'], $values['phone']]);
             $existingUser = $stmt->fetch();
             
             if ($existingUser) {
-                // Если пользователь уже существует, возвращаем его данные
-                return ['login' => $existingUser['login'], 'pass' => '*****'];
-            } else {
-                // Создаем нового пользователя
-                $login = uniqid();
-                $pass = substr(md5(rand()), 0, 8);
-                $pass_hash = md5($pass);
-                
-                $stmt = $db->prepare("
-                    INSERT INTO application 
-                    (full_name, phone, email, birth_date, gender, biography, contract_agreed, login, pass) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ");
-                $stmt->execute([
-                    $values['fio'], 
-                    $values['phone'], 
-                    $values['email'], 
-                    $values['birth_date'], 
-                    $values['gender'], 
-                    $values['biography'], 
-                    $values['contract_agreed'] ? 1 : 0, 
-                    $login, 
-                    $pass_hash
-                ]);
-                
-                $userId = $db->lastInsertId();
-                return ['login' => $login, 'pass' => $pass];
+                // Если пользователь уже существует, не возвращаем никаких данных
+                $db->commit();
+                return false;
             }
+            
+            // Создаем нового пользователя
+            $login = uniqid();
+            $pass = substr(md5(rand()), 0, 8);
+            $pass_hash = md5($pass);
+            
+            $stmt = $db->prepare("
+                INSERT INTO application 
+                (full_name, phone, email, birth_date, gender, biography, contract_agreed, login, pass) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([
+                $values['fio'], 
+                $values['phone'], 
+                $values['email'], 
+                $values['birth_date'], 
+                $values['gender'], 
+                $values['biography'], 
+                $values['contract_agreed'] ? 1 : 0, 
+                $login, 
+                $pass_hash
+            ]);
+            
+            $userId = $db->lastInsertId();
+            
+            // Обновляем языки программирования
+            $db->prepare("DELETE FROM application_languages WHERE application_id = ?")->execute([$userId]);
+            foreach ($values['languages'] as $language_id) {
+                $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)")
+                   ->execute([$userId, $language_id]);
+            }
+            
+            $db->commit();
+            return ['login' => $login, 'pass' => $pass];
         }
-        
-        // Обновляем языки программирования
-        $db->prepare("DELETE FROM application_languages WHERE application_id = ?")->execute([$userId]);
-        foreach ($values['languages'] as $language_id) {
-            $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)")
-               ->execute([$userId, $language_id]);
-        }
-        
-        $db->commit();
-        return true;
     } catch (PDOException $e) {
         $db->rollBack();
         return false;

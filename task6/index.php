@@ -15,7 +15,9 @@ function handleGetRequest() {
     $messages = [];
     if (!empty($_COOKIE['save'])) {
         setcookie('save', '', time() - 3600);
-        if (!empty($_COOKIE['pass'])) {
+        
+        // Показываем сообщение только если есть и логин, и пароль в куках
+        if (!empty($_COOKIE['login']) && !empty($_COOKIE['pass'])) {
             $messages[] = [
                 'html' => 'Вы можете <a href="login.php">войти</a> с логином <strong>' . 
                           htmlspecialchars($_COOKIE['login']) . 
@@ -50,13 +52,12 @@ function handlePostRequest() {
     $result = saveUserData($values, $isEdit, $userId);
     
     if (is_array($result)) {
-        // Устанавливаем куки только если это новый пользователь И у нас нет сессии
-        if (!$isEdit) {
-            setcookie('login', $result['login'], time() + 24 * 60 * 60);
-            setcookie('pass', $result['pass'], time() + 24 * 60 * 60);
-        }
+        // Устанавливаем куки только для нового пользователя
+        setcookie('login', $result['login'], time() + 24 * 60 * 60);
+        setcookie('pass', $result['pass'], time() + 24 * 60 * 60);
         setcookie('save', '1', time() + 24 * 60 * 60);
     } else {
+        // Для существующего пользователя просто устанавливаем флаг сохранения
         setcookie('save', '1', time() + 24 * 60 * 60);
     }
     
