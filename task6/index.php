@@ -44,17 +44,18 @@ function handlePostRequest() {
         exit();
     }
     
-    // Если пользователь авторизован - это редактирование, иначе - создание
+    // ⚠️ Важно: Проверяем, авторизован ли пользователь
     $isEdit = !empty($_SESSION['login']);
     $userId = $_SESSION['uid'] ?? null;
     
     $result = saveUserData($values, $isEdit, $userId);
     
-    if ($result === true) {
-        setcookie('save', '1', time() + 24 * 60 * 60);
-    } elseif (is_array($result)) { // Только при создании нового пользователя
+    if (is_array($result)) {
+        // Выводим логин/пароль только при создании нового пользователя
         setcookie('login', $result['login'], time() + 24 * 60 * 60);
         setcookie('pass', $result['pass'], time() + 24 * 60 * 60);
+        setcookie('save', '1', time() + 24 * 60 * 60);
+    } else {
         setcookie('save', '1', time() + 24 * 60 * 60);
     }
     

@@ -56,7 +56,7 @@ function saveUserData($values, $isEdit = false, $userId = null) {
         $db->beginTransaction();
         
         if ($isEdit && $userId) {
-            // Обновляем существующего пользователя, НЕ меняя пароль
+            // ⚠️ Важно: НЕ обновляем login и pass!
             $stmt = $db->prepare("
                 UPDATE application 
                 SET full_name=?, phone=?, email=?, birth_date=?, gender=?, biography=?, contract_agreed=? 
@@ -72,12 +72,8 @@ function saveUserData($values, $isEdit = false, $userId = null) {
                 $values['contract_agreed'] ? 1 : 0, 
                 $userId
             ]);
-            
-            // Удаляем старые языки и добавляем новые
-            $stmt = $db->prepare("DELETE FROM application_languages WHERE application_id=?");
-            $stmt->execute([$userId]);
         } else {
-            // Создаем нового пользователя с новым логином и паролем
+            // Только для новых пользователей генерируем логин/пароль
             $login = uniqid();
             $pass = substr(md5(rand()), 0, 8);
             $pass_hash = md5($pass);
@@ -100,15 +96,14 @@ function saveUserData($values, $isEdit = false, $userId = null) {
             ]);
             
             $userId = $db->lastInsertId();
-            
-            // Возвращаем логин и пароль только при создании нового пользователя
-            return ['login' => $login, 'pass' => $pass];
+            return ['login' => $login, 'pass' => $pass]; // Возвращаем только для нового пользователя
         }
         
-        // Сохраняем языки программирования
+        // Обновляем языки программирования
+        $db->prepare("DELETE FROM application_languages WHERE application_id = ?")->execute([$userId]);
         foreach ($values['languages'] as $language_id) {
-            $stmt = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
-            $stmt->execute([$userId, $language_id]);
+            $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)")
+               ->execute([$userId, $language_id]);
         }
         
         $db->commit();
