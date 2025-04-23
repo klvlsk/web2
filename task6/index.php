@@ -44,16 +44,17 @@ function handlePostRequest() {
         exit();
     }
     
-    // ⚠️ Важно: Проверяем, авторизован ли пользователь
     $isEdit = !empty($_SESSION['login']);
     $userId = $_SESSION['uid'] ?? null;
     
     $result = saveUserData($values, $isEdit, $userId);
     
     if (is_array($result)) {
-        // Выводим логин/пароль только при создании нового пользователя
-        setcookie('login', $result['login'], time() + 24 * 60 * 60);
-        setcookie('pass', $result['pass'], time() + 24 * 60 * 60);
+        // Устанавливаем куки только если это новый пользователь И у нас нет сессии
+        if (!$isEdit) {
+            setcookie('login', $result['login'], time() + 24 * 60 * 60);
+            setcookie('pass', $result['pass'], time() + 24 * 60 * 60);
+        }
         setcookie('save', '1', time() + 24 * 60 * 60);
     } else {
         setcookie('save', '1', time() + 24 * 60 * 60);

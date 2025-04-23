@@ -56,7 +56,7 @@ function saveUserData($values, $isEdit = false, $userId = null) {
         $db->beginTransaction();
         
         if ($isEdit && $userId) {
-            // ⚠️ Важно: НЕ обновляем login и pass!
+            // Обновляем данные существующего пользователя
             $stmt = $db->prepare("
                 UPDATE application 
                 SET full_name=?, phone=?, email=?, birth_date=?, gender=?, biography=?, contract_agreed=? 
@@ -73,30 +73,40 @@ function saveUserData($values, $isEdit = false, $userId = null) {
                 $userId
             ]);
         } else {
-            // Только для новых пользователей генерируем логин/пароль
-            $login = uniqid();
-            $pass = substr(md5(rand()), 0, 8);
-            $pass_hash = md5($pass);
+            // Проверяем, есть ли уже такой пользователь (по email или телефону)
+            $stmt = $db->prepare("SELECT id, login, pass FROM application WHERE email = ? OR phone = ?");
+            $stmt->execute([$values['email'], $values['phone']]);
+            $existingUser = $stmt->fetch();
             
-            $stmt = $db->prepare("
-                INSERT INTO application 
-                (full_name, phone, email, birth_date, gender, biography, contract_agreed, login, pass) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
-            $stmt->execute([
-                $values['fio'], 
-                $values['phone'], 
-                $values['email'], 
-                $values['birth_date'], 
-                $values['gender'], 
-                $values['biography'], 
-                $values['contract_agreed'] ? 1 : 0, 
-                $login, 
-                $pass_hash
-            ]);
-            
-            $userId = $db->lastInsertId();
-            return ['login' => $login, 'pass' => $pass]; // Возвращаем только для нового пользователя
+            if ($existingUser) {
+                // Если пользователь уже существует, возвращаем его данные
+                return ['login' => $existingUser['login'], 'pass' => '*****'];
+            } else {
+                // Создаем нового пользователя
+                $login = uniqid();
+                $pass = substr(md5(rand()), 0, 8);
+                $pass_hash = md5($pass);
+                
+                $stmt = $db->prepare("
+                    INSERT INTO application 
+                    (full_name, phone, email, birth_date, gender, biography, contract_agreed, login, pass) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ");
+                $stmt->execute([
+                    $values['fio'], 
+                    $values['phone'], 
+                    $values['email'], 
+                    $values['birth_date'], 
+                    $values['gender'], 
+                    $values['biography'], 
+                    $values['contract_agreed'] ? 1 : 0, 
+                    $login, 
+                    $pass_hash
+                ]);
+                
+                $userId = $db->lastInsertId();
+                return ['login' => $login, 'pass' => $pass];
+            }
         }
         
         // Обновляем языки программирования
