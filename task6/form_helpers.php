@@ -49,7 +49,7 @@ function validateForm($values) {
     return $errors;
 }
 
-ffunction saveUserData($values, $isEdit = false, $userId = null) {
+function saveUserData($values, $isEdit = false, $userId = null) {
     $db = getDBConnection();
     
     try {
