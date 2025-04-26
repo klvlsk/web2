@@ -7,21 +7,8 @@ html, body {
 
 body {
     font-family: cursive, sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
     color: #004b90;
     background-color: #d4ebff;
-    display: flex;
-    flex-direction: column;
-}
-
-main {
-    max-width: 960px;
-    padding: 10px;
-    padding-bottom: 60px; /* Увеличено снизу */
-    margin: 0 auto;
-    background-color: #d4ebff;
-    flex: 1;
 }
 
 /* Стили для формы редактирования */
@@ -33,16 +20,15 @@ main {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
-    width: 90%; /* Добавлено для лучшей адаптации */
+    width: 90%;
 }
 
 .edit-container h2 {
-    margin-left: 10px; /* Отступ слева для заголовка */
+    margin-left: 10px;
     margin-bottom: 20px;
     color: #004b90;
 }
 
-/* Остальные стили остаются без изменений */
 form {
     width: 100%;
     margin: 0 auto;
@@ -105,7 +91,7 @@ button[type="submit"]:hover {
     color: red;
     font-size: 14px;
     margin: 10px 0;
-    padding: 0 10px; /* Добавлен отступ слева */
+    padding: 0 10px;
 }
 
 /* Адаптация для мобильных устройств */
