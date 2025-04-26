@@ -31,9 +31,9 @@ main {
 }
 
 form {
-    max-width: 550px; /* Увеличено с 500px до 550px */
+    max-width: 550px;
     margin: 0 auto;
-    padding: 25px; /* Увеличено с 20px до 25px */
+    padding: 25px;
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

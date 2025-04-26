@@ -1,4 +1,3 @@
-/* Основные стили */
 html, body {
     margin: 0;
     padding: 0;
@@ -11,7 +10,6 @@ body {
     background-color: #d4ebff;
 }
 
-/* Стили для формы редактирования */
 .edit-container {
     max-width: 600px;
     margin: 20px auto;
@@ -94,7 +92,6 @@ button[type="submit"]:hover {
     padding: 0 10px;
 }
 
-/* Адаптация для мобильных устройств */
 @media screen and (max-width: 600px) {
     .edit-container {
         padding: 20px;

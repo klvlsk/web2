@@ -1,23 +1,23 @@
 <?php
-require_once 'AuthMiddleware.php';
 require_once 'DatabaseRepository.php';
-require_once 'FormRenderer.php';
+require_once 'template_helpers.php';
 
-AuthMiddleware::requireAdmin();
+session_start();
 
 $db = new DatabaseRepository();
+$db->validateAdminCredentials();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['delete'])) {
         if ($db->deleteUser($_POST['delete'])) {
-            SessionManager::setFlash('success', 'Пользователь успешно удален');
+            $_SESSION['admin_message'] = 'Пользователь успешно удален';
         } else {
-            SessionManager::setFlash('error', 'Ошибка при удалении пользователя');
+            $_SESSION['admin_error'] = 'Ошибка при удалении пользователя';
         }
         header('Location: admin.php');
         exit();
     } elseif (isset($_POST['edit'])) {
-        SessionManager::set('edit_id', $_POST['edit']);
+        $_SESSION['edit_id'] = $_POST['edit'];
         header('Location: edit.php');
         exit();
     }
@@ -39,41 +39,46 @@ $language_stats = $db->getLanguageStatistics();
     <div class="admin-container">
         <h1>Админ-панель</h1>
         
-        <?php $flash = SessionManager::getFlash(); ?>
-        <?php if ($flash): ?>
-            <div class="flash-<?= $flash['type'] ?>"><?= htmlspecialchars($flash['message']) ?></div>
+        <?php if (!empty($_SESSION['admin_message'])): ?>
+            <div class="admin-message"><?= htmlspecialchars($_SESSION['admin_message']) ?></div>
+            <?php unset($_SESSION['admin_message']); ?>
+        <?php endif; ?>
+        
+        <?php if (!empty($_SESSION['admin_error'])): ?>
+            <div class="admin-error"><?= htmlspecialchars($_SESSION['admin_error']) ?></div>
+            <?php unset($_SESSION['admin_error']); ?>
         <?php endif; ?>
         
         <h2>Все заявки</h2>
-        <?= FormRenderer::renderTable($applications, [
-            'id' => 'ID',
-            'full_name' => 'ФИО',
-            'phone' => 'Телефон',
-            'email' => 'Email',
-            'birth_date' => 'Дата рождения',
+        <?= renderTable($applications, [
+            'id' => ['title' => 'ID'],
+            'full_name' => ['title' => 'ФИО'],
+            'phone' => ['title' => 'Телефон'],
+            'email' => ['title' => 'Email'],
+            'birth_date' => ['title' => 'Дата рождения'],
             'gender' => ['title' => 'Пол', 'formatter' => fn($v) => $v == 'male' ? 'Мужской' : 'Женский'],
-            'languages_list' => 'Языки',
-            'biography' => ['title' => 'Биография', 'formatter' => fn($v) => substr($v, 0, 50).(strlen($v) > 50 ? '...' : '')],
+            'languages_list' => ['title' => 'Языки'],
+            'biography' => ['title' => 'Биография', 'formatter' => fn($v) => truncateText($v, 50)],
             'contract_agreed' => ['title' => 'Контракт', 'formatter' => fn($v) => $v ? 'Да' : 'Нет']
         ], [
-            'edit' => 'Редактировать',
-            'delete' => 'Удалить'
+            ['name' => 'edit', 'title' => 'Редактировать'],
+            ['name' => 'delete', 'title' => 'Удалить']
         ]) ?>
         
         <h2>Статистика по языкам</h2>
-        <?= FormRenderer::renderTable($language_stats, [
-            'language_name' => 'Язык',
-            'user_count' => 'Количество пользователей'
+        <?= renderTable($language_stats, [
+            'language_name' => ['title' => 'Язык'],
+            'user_count' => ['title' => 'Количество пользователей']
         ]) ?>
     </div>
-    <script>
-        document.querySelectorAll('button[name="delete"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) {
-                    e.preventDefault();
-                }
-            });
-        });
-    </script>
+<script>
+document.querySelectorAll('button[name="delete"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
 </body>
 </html>

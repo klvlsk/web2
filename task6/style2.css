@@ -54,7 +54,6 @@ tr:hover {
     background-color: #f1f1f1;
 }
 
-/* Базовые стили для кнопок в таблице */
 .admin-container table button[type="submit"] {
     padding: 6px 10px;
     margin: 2px;
@@ -66,25 +65,22 @@ tr:hover {
     white-space: nowrap;
 }
 
-/* Стили для кнопки редактирования */
 .admin-container table button[type="submit"][name="edit"] {
-    background-color: #64b5f6; /* Светло-голубой */
+    background-color: #64b5f6;
 }
 
 .admin-container table button[type="submit"][name="edit"]:hover {
     background-color: #42a5f5;
 }
 
-/* Стили для кнопки удаления */
 .admin-container table button[type="submit"][name="delete"] {
-    background-color: #ba68c8; /* Сиреневый */
+    background-color: #ba68c8;
 }
 
 .admin-container table button[type="submit"][name="delete"]:hover {
     background-color: #ab47bc;
 }
 
-/* Стили для форм, чтобы кнопки были рядом */
 .admin-container table form {
     display: inline-block;
     margin-right: 5px;

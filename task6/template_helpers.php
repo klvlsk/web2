@@ -45,7 +45,6 @@ function renderTable(array $data, array $columns, array $actions = []): string {
 }
 
 function renderFormField(string $type, string $name, string $label, array $errors = [], array $values = [], array $attrs = []): string {
-    // Добавляем защиту от неверного типа
     if (!is_array($errors)) {
         $errors = [];
     }
@@ -53,20 +52,16 @@ function renderFormField(string $type, string $name, string $label, array $error
     $html = '<label>'.htmlspecialchars($label).':</label>';
     $html .= '<input type="'.htmlspecialchars($type).'" name="'.htmlspecialchars($name).'" ';
     
-    // Добавляем атрибуты
     foreach ($attrs as $attr => $val) {
         $html .= htmlspecialchars($attr).'="'.htmlspecialchars($val).'" ';
     }
     
-    // Добавляем класс ошибки если есть
     if (!empty($errors[$name])) {
         $html .= 'class="error" ';
     }
     
-    // Добавляем значение
     $html .= 'value="'.htmlspecialchars($values[$name] ?? '').'">';
     
-    // Выводим сообщение об ошибке
     if (!empty($errors[$name])) {
         $html .= '<div class="error-message">'.htmlspecialchars($errors[$name]).'</div>';
     }

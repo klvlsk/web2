@@ -1,14 +1,14 @@
 <?php
-require_once 'AuthMiddleware.php';
 require_once 'DatabaseRepository.php';
-require_once 'FormRenderer.php';
 require_once 'Validator.php';
+require_once 'template_helpers.php';
 
-AuthMiddleware::requireAdmin();
+session_start();
 
 $db = new DatabaseRepository();
-$edit_id = SessionManager::get('edit_id');
+$db->validateAdminCredentials();
 
+$edit_id = $_SESSION['edit_id'] ?? null;
 if (!$edit_id) {
     header('Location: admin.php');
     exit();
@@ -16,14 +16,12 @@ if (!$edit_id) {
 
 $user_data = $db->getUser($edit_id);
 $user_languages = $db->getUserLanguages($edit_id);
-$errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $errors = Validator::validateUserForm($_POST);
     
     if (empty($errors)) {
         $db->updateUser($edit_id, $_POST);
-        SessionManager::setFlash('success', 'Данные пользователя обновлены');
         header('Location: admin.php');
         exit();
     }
@@ -51,27 +49,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php endif; ?>
         
         <form method="POST">
-            <?= FormRenderer::renderField('text', 'full_name', 'ФИО', $errors, $user_data, ['required' => '']) ?>
-            <?= FormRenderer::renderField('tel', 'phone', 'Телефон', $errors, $user_data, ['required' => '']) ?>
-            <?= FormRenderer::renderField('email', 'email', 'Email', $errors, $user_data, ['required' => '']) ?>
-            <?= FormRenderer::renderField('date', 'birth_date', 'Дата рождения', $errors, $user_data, ['required' => '']) ?>
+            <?= renderFormField('text', 'full_name', 'ФИО', $errors ?? [], $user_data, ['required' => '']) ?>
+            <?= renderFormField('tel', 'phone', 'Телефон', $errors ?? [], $user_data, ['required' => '']) ?>
+            <?= renderFormField('email', 'email', 'Email', $errors ?? [], $user_data, ['required' => '']) ?>
+            <?= renderFormField('date', 'birth_date', 'Дата рождения', $errors ?? [], $user_data, ['required' => '']) ?>
             
             <label>Пол:</label>
-            <?= FormRenderer::renderRadio('gender', 'male', 'Мужской', $user_data) ?>
-            <?= FormRenderer::renderRadio('gender', 'female', 'Женский', $user_data) ?>
-            <?= !empty($errors['gender']) ? '<div class="error-message">'.htmlspecialchars($errors['gender']).'</div>' : '' ?>
+            <?= renderRadioField('gender', 'male', 'Мужской', $user_data) ?>
+            <?= renderRadioField('gender', 'female', 'Женский', $user_data) ?>
+            <?= !empty($errors['gender']) ? '<div class="error-message">' . htmlspecialchars($errors['gender']) . '</div>' : '' ?>
             
             <label>Любимый язык программирования:</label>
-            <?= FormRenderer::renderSelectLanguages($user_languages, $db) ?>
-            <?= !empty($errors['languages']) ? '<div class="error-message">'.htmlspecialchars($errors['languages']).'</div>' : '' ?>
+            <?= renderSelectLanguages($user_languages) ?>
+            <?= !empty($errors['languages']) ? '<div class="error-message">' . htmlspecialchars($errors['languages']) . '</div>' : '' ?>
             
-            <?= FormRenderer::renderField('textarea', 'biography', 'Биография', $errors, $user_data, ['required' => '', 'maxlength' => '500']) ?>
+            <?= renderTextarea('biography', 'Биография', $errors ?? [], $user_data, ['required' => '', 'maxlength' => '500']) ?>
             
             <label>
                 <input type="checkbox" name="contract_agreed" <?= $user_data['contract_agreed'] ? 'checked' : '' ?>>
                 Согласен с контрактом
             </label>
-            <?= !empty($errors['contract_agreed']) ? '<div class="error-message">'.htmlspecialchars($errors['contract_agreed']).'</div>' : '' ?>
+            <?= !empty($errors['contract_agreed']) ? '<div class="error-message">' . htmlspecialchars($errors['contract_agreed']) . '</div>' : '' ?>
             
             <button type="submit">Сохранить изменения</button>
             <a href="admin.php" class="cancel-button">Отмена</a>
