@@ -57,17 +57,12 @@ tr:hover {
 button {
     padding: 6px 10px;
     margin: 2px;
-    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
     white-space: nowrap;
-}
-
-button:hover {
-    background-color: #45a049;
 }
 
 button[type="submit"][name="delete"] {
