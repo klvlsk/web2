@@ -4,22 +4,17 @@ require_once 'Validator.php';
 require_once 'template_helpers.php';
 
 session_start();
-
-// В начале файла, после session_start()
-if (isset($_GET['logout'])) {
-    // Полностью очищаем сессию, но сохраняем куки
-    $_SESSION = [];
-    session_destroy();
-    session_start(); // Начинаем новую сессию
-    
-    // Перенаправляем с флагом new_user
-    header('Location: index.php?new_user=1');
-    exit();
-}
-
 header('Content-Type: text/html; charset=UTF-8');
 
 $db = new DatabaseRepository();
+
+// Обработка выхода
+if (isset($_GET['logout'])) {
+    unset($_SESSION['login'], $_SESSION['uid']);
+    $_SESSION['new_session'] = true;
+    header('Location: index.php');
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     handleGetRequest($db);
@@ -30,23 +25,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 function handleGetRequest(DatabaseRepository $db) {
     $messages = [];
     
-    // Показываем специальное сообщение после выхода
-    if (isset($_GET['new_user'])) {
+    // Сообщение о новой сессии после выхода
+    if (!empty($_SESSION['new_session'])) {
         $messages[] = ['html' => 'Готово к созданию нового пользователя'];
+        unset($_SESSION['new_session']);
     }
-    // Старое сообщение с учетными данными
-    elseif (!empty($_COOKIE['save'])) {
+    // Сообщение с данными для входа
+    elseif (!empty($_COOKIE['save']) && !empty($_COOKIE['login']) && !empty($_COOKIE['pass'])) {
         setcookie('save', '', time() - 3600);
-        
-        if (!empty($_COOKIE['login']) && !empty($_COOKIE['pass'])) {
-            $messages[] = [
-                'html' => 'Вы можете <a href="login.php">войти</a> с логином <strong>' . 
-                          htmlspecialchars($_COOKIE['login']) . 
-                          '</strong> и паролем <strong>' . 
-                          htmlspecialchars($_COOKIE['pass']) . 
-                          '</strong> для изменения данных.'
-            ];
-        }
+        $messages[] = [
+            'html' => 'Вы можете <a href="login.php">войти</a> с логином <strong>' . 
+                      htmlspecialchars($_COOKIE['login']) . 
+                      '</strong> и паролем <strong>' . 
+                      htmlspecialchars($_COOKIE['pass']) . 
+                      '</strong> для изменения данных.'
+        ];
     }
 
     $values = loadUserValues($db);
@@ -56,14 +49,14 @@ function handleGetRequest(DatabaseRepository $db) {
     include('form.php');
 }
 
-// В handlePostRequest function:
 function handlePostRequest(DatabaseRepository $db) {
     $values = getFormValues();
     $errors = Validator::validateUserForm($values);
     
+    // Сохраняем только валидные поля
     saveValidFieldsToCookies($values, $errors);
     
-    $_SESSION['errors'] = is_array($errors) ? $errors : [];
+    $_SESSION['errors'] = $errors;
     $_SESSION['values'] = $values;
     
     if (!empty($errors)) {
@@ -71,26 +64,29 @@ function handlePostRequest(DatabaseRepository $db) {
         exit();
     }
     
-    // Всегда создаем нового пользователя, если не в режиме редактирования
+    // Всегда создаем нового пользователя, если не авторизованы
     if (empty($_SESSION['login'])) {
         $result = $db->createUser($values);
+        
+        // Сохраняем данные для входа
+        setcookie('login', $result['login'], time() + 365 * 24 * 60 * 60);
+        setcookie('pass', $result['pass'], time() + 365 * 24 * 60 * 60);
+        setcookie('save', '1', time() + 365 * 24 * 60 * 60);
+        
+        // Формируем сообщение
         $_SESSION['messages'] = [[
-            'html' => 'Вы можете <a href="login.php">войти</a> с логином <strong>' . 
+            'html' => 'Новый пользователь создан. Вы можете <a href="login.php">войти</a> с логином <strong>' . 
                      htmlspecialchars($result['login']) . 
                      '</strong> и паролем <strong>' . 
                      htmlspecialchars($result['pass']) . 
                      '</strong> для изменения данных.'
         ]];
-        
-        setcookie('login', $result['login'], time() + 365 * 24 * 60 * 60);
-        setcookie('pass', $result['pass'], time() + 365 * 24 * 60 * 60);
     } else {
-        // Режим редактирования существующего пользователя
+        // Режим редактирования
         $db->updateUser($_SESSION['uid'], $values);
         $_SESSION['messages'] = [['html' => 'Данные успешно обновлены']];
     }
     
-    setcookie('save', '1', time() + 365 * 24 * 60 * 60);
     header('Location: index.php');
     exit();
 }

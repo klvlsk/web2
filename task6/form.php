@@ -2,40 +2,39 @@
 require_once 'DatabaseRepository.php';
 require_once 'template_helpers.php';
 
-$errors = is_array($_SESSION['errors'] ?? null) ? $_SESSION['errors'] : [];
+// Убедимся, что сообщения есть в сессии
+$errors = $_SESSION['errors'] ?? [];
 $values = $_SESSION['values'] ?? [];
 $messages = $_SESSION['messages'] ?? [];
 
-unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
+// Очищаем только ошибки и значения, но не сообщения
+unset($_SESSION['errors'], $_SESSION['values']);
 ?>
 
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Форма</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <main>
-        <form action="index.php" method="POST" novalidate>
-            <?php if (!empty($_SESSION['login'])): ?>
-                <div class="edit-mode-notice">
-                    Режим редактирования. Чтобы создать нового пользователя, нажмите "Выйти".
+        <?php if (!empty($_SESSION['login'])): ?>
+            <div class="edit-notice">
+                Режим редактирования. 
+                <a href="index.php?logout=1" class="logout-link">Выйти и создать нового пользователя</a>
+            </div>
+        <?php endif; ?>
+        
+        <form action="index.php" method="POST">
+            <?php if (!empty($messages)): ?>
+                <div class="messages">
+                    <?php foreach ($messages as $message): ?>
+                        <div class="message"><?= $message['html'] ?></div>
+                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
-            <div class="change">
-                <div id="form">
-                    <?php if (!empty($messages)): ?>
-                        <div id="messages">
-                            <?php foreach ($messages as $message): ?>
-                                <div class="success">
-                                    <?= $message['html'] ?? htmlspecialchars($message) ?>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
 
                     <?= renderFormField('text', 'fio', 'ФИО', $errors, $values, [
                         'required' => '',
