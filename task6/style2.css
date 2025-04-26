@@ -65,20 +65,21 @@ button {
     white-space: nowrap;
 }
 
-button[type="submit"][name="delete"] {
-    background-color: #f44336;
-}
-
-button[type="submit"][name="delete"]:hover {
-    background-color: #d32f2f;
-}
-
 button[type="submit"][name="edit"] {
-    background-color: #2196F3;
+    background-color: #64b5f6; /* Светло-голубой */
 }
 
 button[type="submit"][name="edit"]:hover {
-    background-color: #0b7dda;
+    background-color: #42a5f5; /* Чуть более насыщенный голубой */
+}
+
+/* Стили для кнопки удаления (сиреневая) */
+button[type="submit"][name="delete"] {
+    background-color: #ba68c8; /* Сиреневый */
+}
+
+button[type="submit"][name="delete"]:hover {
+    background-color: #ab47bc; /* Чуть более насыщенный сиреневый */
 }
 
 .admin-message {
