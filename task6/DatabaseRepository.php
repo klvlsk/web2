@@ -16,9 +16,22 @@ class DatabaseRepository {
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
             ]);
-            $this->initDatabase($db);
         }
         return $db;
+    }
+
+    public function checkUserCredentials($login, $password) {
+        $stmt = $this->db->prepare("SELECT id, pass FROM application WHERE login = ?");
+        $stmt->execute([$login]);
+        $user = $stmt->fetch();
+        return ($user && md5($password) === $user['pass']) ? $user : null;
+    }
+    
+    public function validateAdminCredentials($login, $password) {
+        $stmt = $this->db->prepare("SELECT * FROM admin_users WHERE login = ?");
+        $stmt->execute([$login]);
+        $admin = $stmt->fetch();
+        return $admin && md5($password) === $admin['password_hash'];
     }
     
     private function initDatabase($db) {
@@ -29,13 +42,6 @@ class DatabaseRepository {
         }
     }
 
-    public function checkUserCredentials($login, $password) {
-        $stmt = $this->db->prepare("SELECT id, pass FROM application WHERE login = ?");
-        $stmt->execute([$login]);
-        $user = $stmt->fetch();
-        return ($user && md5($password) === $user['pass']) ? $user : null;
-    }
-    
     public function getUser($id) {
         $stmt = $this->db->prepare("SELECT * FROM application WHERE id = ?");
         $stmt->execute([$id]);
@@ -135,26 +141,6 @@ class DatabaseRepository {
         return $stmt->fetchAll();
     }
     
-    public function validateAdminCredentials() {
-        if (empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) {
-            header('HTTP/1.1 401 Unauthorized');
-            header('WWW-Authenticate: Basic realm="Admin Panel"');
-            echo '<h1>401 Требуется авторизация</h1>';
-            exit();
-        }
-
-        $stmt = $this->db->prepare("SELECT * FROM admin_users WHERE login = ?");
-        $stmt->execute([$_SERVER['PHP_AUTH_USER']]);
-        $admin = $stmt->fetch();
-
-        if (!$admin || md5($_SERVER['PHP_AUTH_PW']) !== $admin['password_hash']) {
-            header('HTTP/1.1 401 Unauthorized');
-            header('WWW-Authenticate: Basic realm="Admin Panel"');
-            echo '<h1>401 Неверные учетные данные</h1>';
-            exit();
-        }
-    }
-
     public function deleteUser($id) {
         try {
             $this->db->beginTransaction();

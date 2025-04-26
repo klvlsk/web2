@@ -1,32 +1,30 @@
 <?php
+require_once 'SessionManager.php';
 require_once 'DatabaseRepository.php';
 
-session_start();
-header('Content-Type: text/html; charset=UTF-8');
+SessionManager::start();
 
-// Перенаправляем уже авторизованных пользователей
-if (!empty($_SESSION['login'])) {
+if (SessionManager::isLoggedIn()) {
     header('Location: index.php');
     exit();
 }
 
-// Обработка POST-запроса
+$error = '';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $error_message = '';
-    
     if (empty($_POST['login']) || empty($_POST['pass'])) {
-        $error_message = 'Логин и пароль обязательны для заполнения';
+        $error = 'Логин и пароль обязательны для заполнения';
     } else {
         $db = new DatabaseRepository();
         $user = $db->checkUserCredentials($_POST['login'], $_POST['pass']);
         
         if ($user) {
-            $_SESSION['login'] = $_POST['login'];
-            $_SESSION['uid'] = $user['id'];
-            header('Location: index.php?edit=1');
+            SessionManager::set('login', $_POST['login']);
+            SessionManager::set('uid', $user['id']);
+            header('Location: index.php');
             exit();
         } else {
-            $error_message = 'Неверный логин или пароль';
+            $error = 'Неверный логин или пароль';
         }
     }
 }
@@ -48,8 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="password" name="pass" placeholder="Пароль" required>
             <input type="submit" value="Войти">
         </form>
-        <?php if (!empty($error_message)): ?>
-            <div class="error-message"><?= htmlspecialchars($error_message) ?></div>
+        <?php if ($error): ?>
+            <div class="error-message"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
         <a href="index.php" class="back-link">Вернуться на главную</a>
     </div>
