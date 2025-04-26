@@ -41,7 +41,9 @@ function handlePostRequest(DatabaseRepository $db) {
     $values = getFormValues();
     $errors = Validator::validateUserForm($values);
     
-    // Убедимся, что $errors - массив
+    // Сохраняем только валидные поля в куки
+    saveValidFieldsToCookies($values, $errors);
+    
     $_SESSION['errors'] = is_array($errors) ? $errors : [];
     $_SESSION['values'] = $values;
     
@@ -57,11 +59,38 @@ function handlePostRequest(DatabaseRepository $db) {
         ? $db->updateUser($userId, $values)
         : $db->createUser($values);
     
-    setcookie('login', $result['login'], time() + 24 * 60 * 60);
-    setcookie('pass', $result['pass'], time() + 24 * 60 * 60);
-    setcookie('save', '1', time() + 24 * 60 * 60);
+    // Сохраняем логин и пароль для входа
+    setcookie('login', $result['login'], time() + 365 * 24 * 60 * 60);
+    setcookie('pass', $result['pass'], time() + 365 * 24 * 60 * 60);
+    setcookie('save', '1', time() + 365 * 24 * 60 * 60);
     
     header('Location: index.php');
+}
+
+function saveValidFieldsToCookies(array $values, array $errors): void {
+    $validFields = [
+        'fio' => $values['full_name'],
+        'phone' => $values['phone'],
+        'email' => $values['email'],
+        'birth_date' => $values['birth_date'],
+        'gender' => $values['gender'],
+        'biography' => $values['biography'],
+        'languages' => $values['languages'],
+        'contract_agreed' => $values['contract_agreed']
+    ];
+    
+    foreach ($validFields as $field => $value) {
+        // Сохраняем только те поля, которые прошли валидацию
+        if (!isset($errors[$field])) {
+            if ($field === 'languages') {
+                setcookie('languages_value', json_encode($value), time() + 365 * 24 * 60 * 60);
+            } elseif ($field === 'contract_agreed') {
+                setcookie('contract_agreed_value', $value ? '1' : '', time() + 365 * 24 * 60 * 60);
+            } else {
+                setcookie($field.'_value', $value, time() + 365 * 24 * 60 * 60);
+            }
+        }
+    }
 }
 
 function getFormValues(): array {
@@ -83,7 +112,6 @@ function loadUserValues(DatabaseRepository $db): array {
     
     foreach ($fields as $field) {
         $values[$field] = $_COOKIE[$field.'_value'] ?? '';
-        setcookie($field.'_error', '', time() - 3600);
     }
     
     $values['languages'] = !empty($_COOKIE['languages_value']) ? 
