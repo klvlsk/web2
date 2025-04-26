@@ -2,148 +2,17 @@ html, body {
     margin: 0;
     padding: 0;
     width: 100%;
-    overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+    overflow-x: hidden;
 }
 
 body {
     font-family: cursive, sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
     color: #004b90;
     background-color: #d4ebff;
     min-height: 100vh;
 }
 
-main {
-    max-width: 960px;
-    padding: 10px;
-    padding-bottom: 40px;
-    margin: 0 auto;
-    background-color: #d4ebff;
-}
-
-main > .change {
-    display: flex;
-    flex-direction: column;
-}
-
-.background {
-    background-color: #d4ebff;
-}
-
-#form {
-    flex: 1;
-    order: 3;
-}
-
-@media screen and (min-width: 800px) {
-    main > .change {
-        flex-direction: column-reverse;
-    }
-}
-
-form {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 0px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
-}
-
-input, select, textarea {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-family: cursive, sans-serif;
-}
-
-input[type="radio"], input[type="checkbox"] {
-    width: auto;
-    margin-right: 10px;
-}
-
-input[type="submit"] {
-    background-color: #004b90;
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-size: 16px;
-}
-
-input[type="submit"]:hover {
-    background-color: #003366;
-}
-
-#messages {
-    margin-bottom: 20px;
-    padding: 10px;
-    border-radius: 4px;
-}
-
-.error {
-    border: 2px solid red;
-}
-
-.error-message {
-    color: red;
-    font-size: 14px;
-    margin-top: 5px;
-}
-
-#messages .error {
-    color: #c62828;
-    background-color: #ffebee;
-    border: 1px solid #ffcdd2;
-    padding: 10px;
-    margin: 5px 0;
-}
-
-#messages .success {
-    color: #2e7d32;
-    background-color: #e8f5e9;
-    border: 1px solid #c8e6c9;
-    padding: 10px;
-    margin: 5px 0;
-}
-
-select option:checked {
-    background-color: #004b90;
-    color: white;
-}
-
-input.error, select.error, textarea.error {
-    border-color: red;
-}
-
-.error-message {
-    color: red;
-    font-size: 14px;
-    margin-top: 5px;
-}
-
-/* Новые стили для админ-панели */
 .admin-container {
-    max-width: 95%;
-    margin: 20px auto;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
-}
-
-.edit-container {
     max-width: 95%;
     margin: 20px auto;
     padding: 20px;
@@ -209,18 +78,12 @@ button[type="submit"][name="delete"]:hover {
     background-color: #d32f2f;
 }
 
-.cancel-button {
-    display: inline-block;
-    padding: 8px 12px;
-    background-color: #ccc;
-    color: #333;
-    text-decoration: none;
-    border-radius: 4px;
-    margin-left: 10px;
+button[type="submit"][name="edit"] {
+    background-color: #2196F3;
 }
 
-.cancel-button:hover {
-    background-color: #bbb;
+button[type="submit"][name="edit"]:hover {
+    background-color: #0b7dda;
 }
 
 .admin-message {
@@ -231,6 +94,7 @@ button[type="submit"][name="delete"]:hover {
     border: 1px solid #c3e6cb;
     border-radius: 4px;
 }
+
 .admin-error {
     padding: 10px;
     margin: 10px 0;
