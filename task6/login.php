@@ -1,48 +1,35 @@
 <?php
-require_once 'DatabaseRepository.php'; // Заменяем db.php
+require_once 'DatabaseRepository.php';
 
 session_start();
 header('Content-Type: text/html; charset=UTF-8');
 
+// Перенаправляем уже авторизованных пользователей
 if (!empty($_SESSION['login'])) {
     header('Location: index.php');
     exit();
 }
 
-$error_message = '';
-
+// Обработка POST-запроса
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $error_message = handleLogin($_POST['login'], $_POST['pass']);
-}
-
-function handleLogin($login, $password) {
-    $db = new DatabaseRepository();
-    $user = $db->checkUserCredentials($login, $password);
+    $error_message = '';
     
-    if (!$user) {
-        return 'Неверный логин или пароль.';
+    if (empty($_POST['login']) || empty($_POST['pass'])) {
+        $error_message = 'Логин и пароль обязательны для заполнения';
+    } else {
+        $db = new DatabaseRepository();
+        $user = $db->checkUserCredentials($_POST['login'], $_POST['pass']);
+        
+        if ($user) {
+            $_SESSION['login'] = $_POST['login'];
+            $_SESSION['uid'] = $user['id'];
+            header('Location: index.php?edit=1');
+            exit();
+        } else {
+            $error_message = 'Неверный логин или пароль';
+        }
     }
-
-    $_SESSION['login'] = $login;
-    $_SESSION['uid'] = $user['id'];
-    header('Location: index.php');
-    exit();
 }
-
-function handleLogin($login, $password) {
-    $db = new DatabaseRepository();
-    $user = $db->checkUserCredentials($login, $password);
-    
-    if (!$user) {
-        return 'Неверный логин или пароль.';
-    }
-
-    $_SESSION['login'] = $login;
-    $_SESSION['uid'] = $user['id'];
-    header('Location: index.php?edit=1'); // Добавляем флаг редактирования
-    exit();
-}
-
 ?>
 
 <!DOCTYPE html>
