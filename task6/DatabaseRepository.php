@@ -154,4 +154,25 @@ class DatabaseRepository {
             exit();
         }
     }
+
+    public function deleteUser($id) {
+        try {
+            $this->db->beginTransaction();
+            
+            // Сначала удаляем связанные записи в application_languages
+            $stmt = $this->db->prepare("DELETE FROM application_languages WHERE application_id = ?");
+            $stmt->execute([$id]);
+            
+            // Затем удаляем саму заявку
+            $stmt = $this->db->prepare("DELETE FROM application WHERE id = ?");
+            $stmt->execute([$id]);
+            
+            $this->db->commit();
+            return true;
+        } catch (PDOException $e) {
+            $this->db->rollBack();
+            error_log("Error deleting user: " . $e->getMessage());
+            return false;
+        }
+    }
 }

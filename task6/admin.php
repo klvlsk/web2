@@ -9,7 +9,13 @@ $db->validateAdminCredentials();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['delete'])) {
-        $db->deleteUser($_POST['delete']);
+        if ($db->deleteUser($_POST['delete'])) {
+            $_SESSION['admin_message'] = 'Пользователь успешно удален';
+        } else {
+            $_SESSION['admin_error'] = 'Ошибка при удалении пользователя';
+        }
+        header('Location: admin.php');
+        exit();
     } elseif (isset($_POST['edit'])) {
         $_SESSION['edit_id'] = $_POST['edit'];
         header('Location: edit.php');
@@ -33,6 +39,16 @@ $language_stats = $db->getLanguageStatistics();
     <div class="admin-container">
         <h1>Админ-панель</h1>
         
+        <?php if (!empty($_SESSION['admin_message'])): ?>
+            <div class="admin-message"><?= htmlspecialchars($_SESSION['admin_message']) ?></div>
+            <?php unset($_SESSION['admin_message']); ?>
+        <?php endif; ?>
+        
+        <?php if (!empty($_SESSION['admin_error'])): ?>
+            <div class="admin-error"><?= htmlspecialchars($_SESSION['admin_error']) ?></div>
+            <?php unset($_SESSION['admin_error']); ?>
+        <?php endif; ?>
+        
         <h2>Все заявки</h2>
         <?= renderTable($applications, [
             'id' => ['title' => 'ID'],
@@ -55,5 +71,14 @@ $language_stats = $db->getLanguageStatistics();
             'user_count' => ['title' => 'Количество пользователей']
         ]) ?>
     </div>
+<script>
+document.querySelectorAll('button[name="delete"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
 </body>
 </html>
