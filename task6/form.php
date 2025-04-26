@@ -85,9 +85,6 @@ unset($_SESSION['errors'], $_SESSION['values']);
                     <input type="submit" value="Сохранить">
                 </div>
             </div>
-            <?php if (!empty($_SESSION['login'])): ?>
-                <a href="index.php?logout=1" class="logout-button">Выйти и создать нового пользователя</a>
-            <?php endif; ?>
         </form>
     </main>
 </body>
