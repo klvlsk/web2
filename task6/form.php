@@ -27,7 +27,7 @@ unset($_SESSION['errors'], $_SESSION['values']);
             </div>
         <?php endif; ?>
         
-        <form action="index.php" method="POST">
+        <form action="index.php" method="POST" novalidate>
             <?php if (!empty($messages)): ?>
                 <div class="messages">
                     <?php foreach ($messages as $message): ?>
