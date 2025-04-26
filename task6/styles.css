@@ -150,3 +150,10 @@ input.error, select.error, textarea.error {
     margin-bottom: 20px;
     border-radius: 4px;
 }
+
+.edit-mode-notice {
+    background-color: #e3f2fd;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2196f3;
+}

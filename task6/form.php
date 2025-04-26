@@ -20,8 +20,10 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
 <body>
     <main>
         <form action="index.php" method="POST" novalidate>
-            <?php if (!empty($_GET['edit'])): ?>
-                <div class="edit-notice">Режим редактирования данных пользователя</div>
+            <?php if (!empty($_SESSION['login'])): ?>
+                <div class="edit-mode-notice">
+                    Режим редактирования. Чтобы создать нового пользователя, нажмите "Выйти".
+                </div>
             <?php endif; ?>
             <div class="change">
                 <div id="form">

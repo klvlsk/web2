@@ -5,10 +5,15 @@ require_once 'template_helpers.php';
 
 session_start();
 
-// В начале index.php, после session_start()
+// В начале файла, после session_start()
 if (isset($_GET['logout'])) {
-    unset($_SESSION['login'], $_SESSION['uid']);
-    header('Location: index.php');
+    // Полностью очищаем сессию, но сохраняем куки
+    $_SESSION = [];
+    session_destroy();
+    session_start(); // Начинаем новую сессию
+    
+    // Перенаправляем с флагом new_user
+    header('Location: index.php?new_user=1');
     exit();
 }
 
@@ -24,7 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
 function handleGetRequest(DatabaseRepository $db) {
     $messages = [];
-    if (!empty($_COOKIE['save'])) {
+    
+    // Показываем специальное сообщение после выхода
+    if (isset($_GET['new_user'])) {
+        $messages[] = ['html' => 'Готово к созданию нового пользователя'];
+    }
+    // Старое сообщение с учетными данными
+    elseif (!empty($_COOKIE['save'])) {
         setcookie('save', '', time() - 3600);
         
         if (!empty($_COOKIE['login']) && !empty($_COOKIE['pass'])) {
@@ -45,6 +56,7 @@ function handleGetRequest(DatabaseRepository $db) {
     include('form.php');
 }
 
+// В handlePostRequest function:
 function handlePostRequest(DatabaseRepository $db) {
     $values = getFormValues();
     $errors = Validator::validateUserForm($values);
@@ -59,24 +71,26 @@ function handlePostRequest(DatabaseRepository $db) {
         exit();
     }
     
-    // Если пользователь авторизован - обновляем его данные
-    if (!empty($_SESSION['login'])) {
-        $result = $db->updateUser($_SESSION['uid'], $values);
-        $message = "Данные успешно обновлены";
-    } 
-    // Если не авторизован - создаем нового пользователя
-    else {
+    // Всегда создаем нового пользователя, если не в режиме редактирования
+    if (empty($_SESSION['login'])) {
         $result = $db->createUser($values);
-        $message = "Новый пользователь создан. Логин: {$result['login']}, Пароль: {$result['pass']}";
+        $_SESSION['messages'] = [[
+            'html' => 'Вы можете <a href="login.php">войти</a> с логином <strong>' . 
+                     htmlspecialchars($result['login']) . 
+                     '</strong> и паролем <strong>' . 
+                     htmlspecialchars($result['pass']) . 
+                     '</strong> для изменения данных.'
+        ]];
         
-        // Сохраняем данные для входа в куки
         setcookie('login', $result['login'], time() + 365 * 24 * 60 * 60);
         setcookie('pass', $result['pass'], time() + 365 * 24 * 60 * 60);
+    } else {
+        // Режим редактирования существующего пользователя
+        $db->updateUser($_SESSION['uid'], $values);
+        $_SESSION['messages'] = [['html' => 'Данные успешно обновлены']];
     }
     
     setcookie('save', '1', time() + 365 * 24 * 60 * 60);
-    $_SESSION['messages'] = [['html' => $message]];
-    
     header('Location: index.php');
     exit();
 }
