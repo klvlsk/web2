@@ -20,6 +20,9 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
 <body>
     <main>
         <form action="index.php" method="POST" novalidate>
+            <?php if (!empty($_GET['edit'])): ?>
+                <div class="edit-notice">Режим редактирования данных пользователя</div>
+            <?php endif; ?>
             <div class="change">
                 <div id="form">
                     <?php if (!empty($messages)): ?>
@@ -81,6 +84,9 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
                     <input type="submit" value="Сохранить">
                 </div>
             </div>
+            <?php if (!empty($_SESSION['login'])): ?>
+                <a href="index.php?logout=1" class="logout-button">Выйти и создать нового пользователя</a>
+            <?php endif; ?>
         </form>
     </main>
 </body>

@@ -28,6 +28,21 @@ function handleLogin($login, $password) {
     header('Location: index.php');
     exit();
 }
+
+function handleLogin($login, $password) {
+    $db = new DatabaseRepository();
+    $user = $db->checkUserCredentials($login, $password);
+    
+    if (!$user) {
+        return 'Неверный логин или пароль.';
+    }
+
+    $_SESSION['login'] = $login;
+    $_SESSION['uid'] = $user['id'];
+    header('Location: index.php?edit=1'); // Добавляем флаг редактирования
+    exit();
+}
+
 ?>
 
 <!DOCTYPE html>

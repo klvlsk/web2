@@ -4,6 +4,14 @@ require_once 'Validator.php';
 require_once 'template_helpers.php';
 
 session_start();
+
+// В начале index.php, после session_start()
+if (isset($_GET['logout'])) {
+    unset($_SESSION['login'], $_SESSION['uid']);
+    header('Location: index.php');
+    exit();
+}
+
 header('Content-Type: text/html; charset=UTF-8');
 
 $db = new DatabaseRepository();
@@ -41,7 +49,6 @@ function handlePostRequest(DatabaseRepository $db) {
     $values = getFormValues();
     $errors = Validator::validateUserForm($values);
     
-    // Сохраняем только валидные поля в куки
     saveValidFieldsToCookies($values, $errors);
     
     $_SESSION['errors'] = is_array($errors) ? $errors : [];
@@ -52,19 +59,26 @@ function handlePostRequest(DatabaseRepository $db) {
         exit();
     }
     
-    $isEdit = !empty($_SESSION['login']);
-    $userId = $_SESSION['uid'] ?? null;
+    // Если пользователь авторизован - обновляем его данные
+    if (!empty($_SESSION['login'])) {
+        $result = $db->updateUser($_SESSION['uid'], $values);
+        $message = "Данные успешно обновлены";
+    } 
+    // Если не авторизован - создаем нового пользователя
+    else {
+        $result = $db->createUser($values);
+        $message = "Новый пользователь создан. Логин: {$result['login']}, Пароль: {$result['pass']}";
+        
+        // Сохраняем данные для входа в куки
+        setcookie('login', $result['login'], time() + 365 * 24 * 60 * 60);
+        setcookie('pass', $result['pass'], time() + 365 * 24 * 60 * 60);
+    }
     
-    $result = $isEdit 
-        ? $db->updateUser($userId, $values)
-        : $db->createUser($values);
-    
-    // Сохраняем логин и пароль для входа
-    setcookie('login', $result['login'], time() + 365 * 24 * 60 * 60);
-    setcookie('pass', $result['pass'], time() + 365 * 24 * 60 * 60);
     setcookie('save', '1', time() + 365 * 24 * 60 * 60);
+    $_SESSION['messages'] = [['html' => $message]];
     
     header('Location: index.php');
+    exit();
 }
 
 function saveValidFieldsToCookies(array $values, array $errors): void {
