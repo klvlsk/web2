@@ -80,6 +80,8 @@ unset($_SESSION['errors'], $_SESSION['values']);
                 <div class="error-message"><?= htmlspecialchars($errors['contract_agreed']) ?></div>
             <?php endif; ?>
 
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+
             <input type="submit" value="Сохранить">
         </form>
     </main>

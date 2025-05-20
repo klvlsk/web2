@@ -1,4 +1,7 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once 'DatabaseRepository.php';
 require_once 'Validator.php';
 require_once 'template_helpers.php';
