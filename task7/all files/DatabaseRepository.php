@@ -9,11 +9,7 @@ class DatabaseRepository {
     private function getDBConnection() {
         static $db = null;
         if ($db === null) {
-            $configPath = __DIR__ . '/../plus/config.php';
-if (!file_exists($configPath)) {
-    die("Config file not found at: " . $configPath);
-}
-$config = require $configPath;
+            $config = require __DIR__ . '/../plus/config.php';
             $db = new PDO(
                 "mysql:host={$config['db']['host']};dbname={$config['db']['dbname']}",
                 $config['db']['user'],

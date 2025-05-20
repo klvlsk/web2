@@ -1,7 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 require_once 'DatabaseRepository.php';
 require_once 'Validator.php';
 require_once 'template_helpers.php';
@@ -20,7 +17,7 @@ if (isset($_GET['logout'])) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     handleGetRequest($db);
-} else {
+} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
     handlePostRequest($db);
 }
 
@@ -63,27 +60,33 @@ function handlePostRequest(DatabaseRepository $db) {
         exit();
     }
     
-    if (empty($_SESSION['login'])) {
-        $result = $db->createUser($values);
+    try {
+        if (empty($_SESSION['login'])) {
+            $result = $db->createUser($values);
+            
+            setcookie('login', $result['login'], time() + 365 * 24 * 60 * 60);
+            setcookie('pass', $result['pass'], time() + 365 * 24 * 60 * 60);
+            setcookie('save', '1', time() + 365 * 24 * 60 * 60);
+            
+            $_SESSION['messages'] = [[
+                'html' => 'Новый пользователь создан. Вы можете <a href="login.php">войти</a> с логином <strong>' . 
+                         htmlspecialchars($result['login']) . 
+                         '</strong> и паролем <strong>' . 
+                         htmlspecialchars($result['pass']) . 
+                         '</strong> для изменения данных.'
+            ]];
+        } else {
+            $db->updateUser($_SESSION['uid'], $values);
+            $_SESSION['messages'] = [['html' => 'Данные успешно обновлены']];
+        }
         
-        setcookie('login', $result['login'], time() + 365 * 24 * 60 * 60);
-        setcookie('pass', $result['pass'], time() + 365 * 24 * 60 * 60);
-        setcookie('save', '1', time() + 365 * 24 * 60 * 60);
-        
-        $_SESSION['messages'] = [[
-            'html' => 'Новый пользователь создан. Вы можете <a href="login.php">войти</a> с логином <strong>' . 
-                     htmlspecialchars($result['login']) . 
-                     '</strong> и паролем <strong>' . 
-                     htmlspecialchars($result['pass']) . 
-                     '</strong> для изменения данных.'
-        ]];
-    } else {
-        $db->updateUser($_SESSION['uid'], $values);
-        $_SESSION['messages'] = [['html' => 'Данные успешно обновлены']];
+        header('Location: index.php');
+        exit();
+    } catch (Exception $e) {
+        $_SESSION['errors']['general'] = 'Ошибка при сохранении данных: ' . $e->getMessage();
+        header('Location: index.php');
+        exit();
     }
-    
-    header('Location: index.php');
-    exit();
 }
 
 function saveValidFieldsToCookies(array $values, array $errors): void {

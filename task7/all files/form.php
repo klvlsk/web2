@@ -25,6 +25,10 @@ unset($_SESSION['errors'], $_SESSION['values']);
             </div>
         <?php endif; ?>
         
+        <?php if (!empty($errors['general'])): ?>
+            <div class="error-message"><?= htmlspecialchars($errors['general']) ?></div>
+        <?php endif; ?>
+        
         <form action="index.php" method="POST" novalidate>
             <?php if (!empty($messages)): ?>
                 <div class="messages">
@@ -79,8 +83,6 @@ unset($_SESSION['errors'], $_SESSION['values']);
             <?php if (!empty($errors['contract_agreed'])): ?>
                 <div class="error-message"><?= htmlspecialchars($errors['contract_agreed']) ?></div>
             <?php endif; ?>
-
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
 
             <input type="submit" value="Сохранить">
         </form>
