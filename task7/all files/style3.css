@@ -1,0 +1,109 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+body {
+    font-family: cursive, sans-serif;
+    color: #004b90;
+    background-color: #d4ebff;
+}
+
+.edit-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    width: 90%;
+}
+
+.edit-container h2 {
+    margin-left: 10px;
+    margin-bottom: 20px;
+    color: #004b90;
+}
+
+form {
+    width: 100%;
+    margin: 0 auto;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: cursive, sans-serif;
+    box-sizing: border-box;
+}
+
+input[type="radio"], input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    margin-left: 5px;
+}
+
+button[type="submit"] {
+    background-color: #004b90;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+    background-color: #003366;
+}
+
+.cancel-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #ccc;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-left: 15px;
+    font-size: 16px;
+}
+
+.cancel-button:hover {
+    background-color: #bbb;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin: 10px 0;
+    padding: 0 10px;
+}
+
+@media screen and (max-width: 600px) {
+    .edit-container {
+        padding: 20px;
+        width: 95%;
+    }
+    
+    button[type="submit"], .cancel-button {
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    .cancel-button {
+        margin-left: 0;
+    }
+}
