@@ -30,8 +30,6 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
         <?php endif; ?>
         
         <form action="index.php" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-            
             <?php if (!empty($messages)): ?>
                 <div class="messages">
                 <?php foreach ($messages as $message): ?>

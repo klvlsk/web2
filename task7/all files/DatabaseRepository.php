@@ -10,49 +10,35 @@ class DatabaseRepository {
         static $db = null;
         if ($db === null) {
             $config = require __DIR__ . '/../plus/config.php';
-            try {
-                $db = new PDO(
-                    "mysql:host={$config['db']['host']};dbname={$config['db']['dbname']}",
-                    $config['db']['user'],
-                    $config['db']['pass'],
-                    [
-                        PDO::ATTR_PERSISTENT => true,
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-                    ]
-                );
-                $this->initDatabase($db);
-            } catch (PDOException $e) {
-                error_log("Database connection error: " . $e->getMessage());
-                throw new RuntimeException("Database connection error");
-            }
+            $db = new PDO(
+                "mysql:host={$config['db']['host']};dbname={$config['db']['dbname']}",
+                $config['db']['user'],
+                $config['db']['pass'],
+                [
+                    PDO::ATTR_PERSISTENT => true,
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                ]
+            );
+            $this->initDatabase($db);
         }
         return $db;
     }
     
     private function initDatabase($db) {
-        try {
-            $stmt = $db->prepare("SELECT COUNT(*) FROM admin_users");
-            $stmt->execute();
-            if ($stmt->fetchColumn() == 0) {
-                $stmt = $db->prepare("INSERT INTO admin_users (login, password_hash) VALUES (?, ?)");
-                $stmt->execute(['admin', password_hash('123', PASSWORD_DEFAULT)]);
-            }
-        } catch (PDOException $e) {
-            error_log("Database initialization error: " . $e->getMessage());
+        $stmt = $db->prepare("SELECT COUNT(*) FROM admin_users");
+        $stmt->execute();
+        if ($stmt->fetchColumn() == 0) {
+            $stmt = $db->prepare("INSERT INTO admin_users (login, password_hash) VALUES (?, ?)");
+            $stmt->execute(['admin', md5('123')]);
         }
     }
 
     public function checkUserCredentials($login, $password) {
-        try {
-            $stmt = $this->db->prepare("SELECT id, pass FROM application WHERE login = ?");
-            $stmt->execute([$login]);
-            $user = $stmt->fetch();
-            return ($user && password_verify($password, $user['pass'])) ? $user : null;
-        } catch (PDOException $e) {
-            error_log("Login error: " . $e->getMessage());
-            return null;
-        }
+        $stmt = $this->db->prepare("SELECT id, pass FROM application WHERE login = ?");
+        $stmt->execute([$login]);
+        $user = $stmt->fetch();
+        return ($user && md5($password) === $user['pass']) ? $user : null;
     }
     
     public function getUser($id) {
@@ -74,8 +60,8 @@ class DatabaseRepository {
     
     public function createUser($data) {
         $login = uniqid();
-        $pass = substr(bin2hex(random_bytes(4)), 0, 8);
-        $pass_hash = password_hash($pass, PASSWORD_DEFAULT);
+        $pass = substr(md5(rand()), 0, 8);
+        $pass_hash = md5($pass);
         
         $stmt = $this->db->prepare("
             INSERT INTO application 
@@ -166,7 +152,7 @@ class DatabaseRepository {
         $stmt->execute([$_SERVER['PHP_AUTH_USER']]);
         $admin = $stmt->fetch();
 
-        if (!$admin || !password_verify($_SERVER['PHP_AUTH_PW'], $admin['password_hash'])) {
+        if (!$admin || md5($_SERVER['PHP_AUTH_PW']) !== $admin['password_hash']) {
             header('HTTP/1.1 401 Unauthorized');
             header('WWW-Authenticate: Basic realm="Admin Panel"');
             echo '<h1>401 Неверные учетные данные</h1>';

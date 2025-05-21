@@ -24,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             header('Location: index.php?edit=1');
             exit();
         } else {
-            error_log("Failed login attempt for login: " . $_POST['login']);
             $error_message = 'Неверный логин или пароль';
         }
     }
