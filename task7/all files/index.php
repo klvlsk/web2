@@ -81,25 +81,31 @@ function handlePostRequest(DatabaseRepository $db) {
 
     try {
         if (empty($_SESSION['login'])) {
-            $result = $db->createUser($values);
-            
-            $config = require __DIR__ . '/../plus/config.php';
-            $cookieOptions = $config['security']['cookie_options'];
-            $cookieOptions['expires'] = time() + $config['security']['cookie_options']['lifetime'];
-            
-            setcookie('login', $result['login'], $cookieOptions);
-            setcookie('pass', $result['pass'], $cookieOptions);
-            setcookie('save', '1', $cookieOptions);
-            
-            $_SESSION['messages'] = [[
-                'html' => 'Новый пользователь создан. Вы можете <a href="login.php">войти</a> с логином <strong>' . 
-                         htmlspecialchars($result['login']) . 
-                         '</strong> и паролем <strong>' . 
-                         htmlspecialchars($result['pass']) . 
-                         '</strong> для изменения данных.',
-                'raw_html' => true
-            ]];
-        } else {
+    $result = $db->createUser($values);
+    
+    $config = require __DIR__ . '/../plus/config.php';
+    $cookieOptions = [
+        'expires' => time() + $config['security']['cookie_lifetime'],
+        'path' => $config['security']['cookie_path'],
+        'domain' => $config['security']['cookie_domain'],
+        'secure' => $config['security']['cookie_secure'],
+        'httponly' => $config['security']['cookie_httponly'],
+        'samesite' => $config['security']['cookie_samesite']
+    ];
+    
+    setcookie('login', $result['login'], $cookieOptions);
+    setcookie('pass', $result['pass'], $cookieOptions);
+    setcookie('save', '1', $cookieOptions);
+    
+    $_SESSION['messages'] = [[
+        'html' => 'Новый пользователь создан. Вы можете <a href="login.php">войти</a> с логином <strong>' . 
+                 htmlspecialchars($result['login']) . 
+                 '</strong> и паролем <strong>' . 
+                 htmlspecialchars($result['pass']) . 
+                 '</strong> для изменения данных.',
+        'raw_html' => true
+    ]];
+} else {
             $db->updateUser($_SESSION['uid'], $values);
             $_SESSION['messages'] = [['html' => 'Данные успешно обновлены']];
         }
@@ -127,17 +133,49 @@ function saveValidFieldsToCookies(array $values, array $errors): void {
     ];
     
     $config = require __DIR__ . '/../plus/config.php';
-    $cookieOptions = $config['security']['cookie_options'];
-    $cookieOptions['expires'] = time() + $config['security']['cookie_options']['lifetime'];
+    $expires = time() + $config['security']['cookie_lifetime'];
     
     foreach ($validFields as $field => $value) {
         if (!isset($errors[$field])) {
             if ($field === 'languages') {
-                setcookie('languages_value', json_encode($value), $cookieOptions);
+                setcookie(
+                    'languages_value', 
+                    json_encode($value), 
+                    [
+                        'expires' => $expires,
+                        'path' => $config['security']['cookie_path'],
+                        'domain' => $config['security']['cookie_domain'],
+                        'secure' => $config['security']['cookie_secure'],
+                        'httponly' => $config['security']['cookie_httponly'],
+                        'samesite' => $config['security']['cookie_samesite']
+                    ]
+                );
             } elseif ($field === 'contract_agreed') {
-                setcookie('contract_agreed_value', $value ? '1' : '', $cookieOptions);
+                setcookie(
+                    'contract_agreed_value', 
+                    $value ? '1' : '', 
+                    [
+                        'expires' => $expires,
+                        'path' => $config['security']['cookie_path'],
+                        'domain' => $config['security']['cookie_domain'],
+                        'secure' => $config['security']['cookie_secure'],
+                        'httponly' => $config['security']['cookie_httponly'],
+                        'samesite' => $config['security']['cookie_samesite']
+                    ]
+                );
             } else {
-                setcookie($field.'_value', $value, $cookieOptions);
+                setcookie(
+                    $field.'_value', 
+                    $value, 
+                    [
+                        'expires' => $expires,
+                        'path' => $config['security']['cookie_path'],
+                        'domain' => $config['security']['cookie_domain'],
+                        'secure' => $config['security']['cookie_secure'],
+                        'httponly' => $config['security']['cookie_httponly'],
+                        'samesite' => $config['security']['cookie_samesite']
+                    ]
+                );
             }
         }
     }

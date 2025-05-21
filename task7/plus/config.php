@@ -8,13 +8,11 @@ return [
     ],
     'security' => [
         'password_algo' => PASSWORD_DEFAULT,
-        'cookie_options' => [
-            'lifetime' => 30 * 24 * 60 * 60,
-            'path' => '/',
-            'domain' => '',
-            'secure' => true,
-            'httponly' => true,
-            'samesite' => 'Strict'
-        ]
+        'cookie_lifetime' => 30 * 24 * 60 * 60,
+        'cookie_path' => '/',
+        'cookie_domain' => '',
+        'cookie_secure' => true,
+        'cookie_httponly' => true,
+        'cookie_samesite' => 'Strict'
     ]
 ];
