@@ -6,8 +6,14 @@ require_once 'template_helpers.php';
 session_start();
 header('Content-Type: text/html; charset=UTF-8');
 
+// Включим вывод всех ошибок для отладки
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $db = new DatabaseRepository();
 
+// Обработка выхода
 if (isset($_GET['logout'])) {
     unset($_SESSION['login'], $_SESSION['uid']);
     $_SESSION['new_session'] = true;
@@ -15,9 +21,12 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+// Обработка GET запроса
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     handleGetRequest($db);
-} elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
+} 
+// Обработка POST запроса
+elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     handlePostRequest($db);
 }
 
@@ -44,23 +53,38 @@ function handleGetRequest(DatabaseRepository $db) {
     $_SESSION['messages'] = $messages;
     
     include('form.php');
+    exit(); // Важно завершить выполнение после включения формы
 }
 
 function handlePostRequest(DatabaseRepository $db) {
-    $values = getFormValues();
+    // Получаем данные формы
+    $values = [
+        'full_name' => $_POST['fio'] ?? '',
+        'phone' => $_POST['phone'] ?? '',
+        'email' => $_POST['email'] ?? '',
+        'birth_date' => $_POST['birth_date'] ?? '',
+        'gender' => $_POST['gender'] ?? '',
+        'biography' => $_POST['biography'] ?? '',
+        'contract_agreed' => isset($_POST['contract_agreed']),
+        'languages' => $_POST['languages'] ?? []
+    ];
+
+    // Валидация
     $errors = Validator::validateUserForm($values);
     
+    // Сохраняем валидные поля в куки
     saveValidFieldsToCookies($values, $errors);
     
-    $_SESSION['errors'] = $errors;
-    $_SESSION['values'] = $values;
-    
+    // Если есть ошибки - возвращаем на форму
     if (!empty($errors)) {
+        $_SESSION['errors'] = $errors;
+        $_SESSION['values'] = $values;
         header('Location: index.php');
         exit();
     }
-    
+
     try {
+        // Создание или обновление пользователя
         if (empty($_SESSION['login'])) {
             $result = $db->createUser($values);
             
@@ -112,19 +136,6 @@ function saveValidFieldsToCookies(array $values, array $errors): void {
             }
         }
     }
-}
-
-function getFormValues(): array {
-    return [
-        'full_name' => $_POST['fio'] ?? '',
-        'phone' => $_POST['phone'] ?? '',
-        'email' => $_POST['email'] ?? '',
-        'birth_date' => $_POST['birth_date'] ?? '',
-        'gender' => $_POST['gender'] ?? '',
-        'biography' => $_POST['biography'] ?? '',
-        'contract_agreed' => isset($_POST['contract_agreed']),
-        'languages' => $_POST['languages'] ?? []
-    ];
 }
 
 function loadUserValues(DatabaseRepository $db): array {

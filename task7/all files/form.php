@@ -6,7 +6,7 @@ $errors = $_SESSION['errors'] ?? [];
 $values = $_SESSION['values'] ?? [];
 $messages = $_SESSION['messages'] ?? [];
 
-unset($_SESSION['errors'], $_SESSION['values']);
+unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +29,7 @@ unset($_SESSION['errors'], $_SESSION['values']);
             <div class="error-message"><?= htmlspecialchars($errors['general']) ?></div>
         <?php endif; ?>
         
-        <form action="index.php" method="POST" novalidate>
+        <form action="index.php" method="POST" enctype="multipart/form-data">
             <?php if (!empty($messages)): ?>
                 <div class="messages">
                     <?php foreach ($messages as $message): ?>
@@ -38,53 +38,84 @@ unset($_SESSION['errors'], $_SESSION['values']);
                 </div>
             <?php endif; ?>
 
-            <?= renderFormField('text', 'fio', 'ФИО', $errors, $values, [
-                'required' => '',
-                'pattern' => '[A-Za-zА-Яа-я\s]{1,150}',
-                'maxlength' => '150'
-            ]) ?>
+            <div class="form-group">
+                <label for="fio">ФИО:</label>
+                <input type="text" id="fio" name="fio" value="<?= htmlspecialchars($values['fio'] ?? '') ?>" 
+                       required pattern="[A-Za-zА-Яа-я\s]{1,150}" maxlength="150">
+                <?php if (!empty($errors['full_name'])): ?>
+                    <div class="error-message"><?= htmlspecialchars($errors['full_name']) ?></div>
+                <?php endif; ?>
+            </div>
 
-            <?= renderFormField('tel', 'phone', 'Телефон', $errors, $values, [
-                'required' => '',
-                'pattern' => '\+7\d{10}'
-            ]) ?>
+            <div class="form-group">
+                <label for="phone">Телефон:</label>
+                <input type="tel" id="phone" name="phone" value="<?= htmlspecialchars($values['phone'] ?? '') ?>" 
+                       required pattern="\+7\d{10}">
+                <?php if (!empty($errors['phone'])): ?>
+                    <div class="error-message"><?= htmlspecialchars($errors['phone']) ?></div>
+                <?php endif; ?>
+            </div>
 
-            <?= renderFormField('email', 'email', 'Email', $errors, $values, [
-                'required' => ''
-            ]) ?>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="<?= htmlspecialchars($values['email'] ?? '') ?>" required>
+                <?php if (!empty($errors['email'])): ?>
+                    <div class="error-message"><?= htmlspecialchars($errors['email']) ?></div>
+                <?php endif; ?>
+            </div>
 
-            <?= renderFormField('date', 'birth_date', 'Дата рождения', $errors, $values, [
-                'required' => ''
-            ]) ?>
+            <div class="form-group">
+                <label for="birth_date">Дата рождения:</label>
+                <input type="date" id="birth_date" name="birth_date" value="<?= htmlspecialchars($values['birth_date'] ?? '') ?>" required>
+                <?php if (!empty($errors['birth_date'])): ?>
+                    <div class="error-message"><?= htmlspecialchars($errors['birth_date']) ?></div>
+                <?php endif; ?>
+            </div>
 
-            <label>Пол:</label>
-            <?= renderRadioField('gender', 'male', 'Мужской', $values) ?>
-            <?= renderRadioField('gender', 'female', 'Женский', $values) ?>
-            <?php if (!empty($errors['gender'])): ?>
-                <div class="error-message"><?= htmlspecialchars($errors['gender']) ?></div>
-            <?php endif; ?>
+            <div class="form-group">
+                <label>Пол:</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="gender" value="male" <?= ($values['gender'] ?? '') === 'male' ? 'checked' : '' ?>>
+                        Мужской
+                    </label>
+                    <label>
+                        <input type="radio" name="gender" value="female" <?= ($values['gender'] ?? '') === 'female' ? 'checked' : '' ?>>
+                        Женский
+                    </label>
+                </div>
+                <?php if (!empty($errors['gender'])): ?>
+                    <div class="error-message"><?= htmlspecialchars($errors['gender']) ?></div>
+                <?php endif; ?>
+            </div>
 
-            <label>Любимый язык программирования:</label>
-            <?= renderSelectLanguages($values['languages'] ?? []) ?>
-            <?php if (!empty($errors['languages'])): ?>
-                <div class="error-message"><?= htmlspecialchars($errors['languages']) ?></div>
-            <?php endif; ?>
+            <div class="form-group">
+                <label>Любимый язык программирования:</label>
+                <?= renderSelectLanguages($values['languages'] ?? []) ?>
+                <?php if (!empty($errors['languages'])): ?>
+                    <div class="error-message"><?= htmlspecialchars($errors['languages']) ?></div>
+                <?php endif; ?>
+            </div>
 
-            <?= renderTextarea('biography', 'Биография', $errors, $values, [
-                'required' => '',
-                'maxlength' => '500'
-            ]) ?>
+            <div class="form-group">
+                <label for="biography">Биография:</label>
+                <textarea id="biography" name="biography" required maxlength="500"><?= htmlspecialchars($values['biography'] ?? '') ?></textarea>
+                <?php if (!empty($errors['biography'])): ?>
+                    <div class="error-message"><?= htmlspecialchars($errors['biography']) ?></div>
+                <?php endif; ?>
+            </div>
 
-            <label>
-                <input type="checkbox" name="contract_agreed" required 
-                    <?= !empty($values['contract_agreed']) ? 'checked' : '' ?>>
-                С контрактом ознакомлен(а)
-            </label>
-            <?php if (!empty($errors['contract_agreed'])): ?>
-                <div class="error-message"><?= htmlspecialchars($errors['contract_agreed']) ?></div>
-            <?php endif; ?>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="contract_agreed" required <?= !empty($values['contract_agreed']) ? 'checked' : '' ?>>
+                    С контрактом ознакомлен(а)
+                </label>
+                <?php if (!empty($errors['contract_agreed'])): ?>
+                    <div class="error-message"><?= htmlspecialchars($errors['contract_agreed']) ?></div>
+                <?php endif; ?>
+            </div>
 
-            <input type="submit" value="Сохранить">
+            <button type="submit">Сохранить</button>
         </form>
     </main>
 </body>
