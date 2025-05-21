@@ -6,7 +6,6 @@ require_once 'template_helpers.php';
 session_start();
 header('Content-Type: text/html; charset=UTF-8');
 
-// Генерация CSRF-токена
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -84,9 +83,13 @@ function handlePostRequest(DatabaseRepository $db) {
         if (empty($_SESSION['login'])) {
             $result = $db->createUser($values);
             
-            setcookie('login', $result['login'], time() + 365 * 24 * 60 * 60);
-            setcookie('pass', $result['pass'], time() + 365 * 24 * 60 * 60);
-            setcookie('save', '1', time() + 365 * 24 * 60 * 60);
+            $config = require __DIR__ . '/../plus/config.php';
+            $cookieOptions = $config['security']['cookie_options'];
+            $cookieOptions['expires'] = time() + $config['security']['cookie_options']['lifetime'];
+            
+            setcookie('login', $result['login'], $cookieOptions);
+            setcookie('pass', $result['pass'], $cookieOptions);
+            setcookie('save', '1', $cookieOptions);
             
             $_SESSION['messages'] = [[
                 'html' => 'Новый пользователь создан. Вы можете <a href="login.php">войти</a> с логином <strong>' . 
@@ -123,14 +126,18 @@ function saveValidFieldsToCookies(array $values, array $errors): void {
         'contract_agreed' => $values['contract_agreed']
     ];
     
+    $config = require __DIR__ . '/../plus/config.php';
+    $cookieOptions = $config['security']['cookie_options'];
+    $cookieOptions['expires'] = time() + $config['security']['cookie_options']['lifetime'];
+    
     foreach ($validFields as $field => $value) {
         if (!isset($errors[$field])) {
             if ($field === 'languages') {
-                setcookie('languages_value', json_encode($value), time() + 365 * 24 * 60 * 60);
+                setcookie('languages_value', json_encode($value), $cookieOptions);
             } elseif ($field === 'contract_agreed') {
-                setcookie('contract_agreed_value', $value ? '1' : '', time() + 365 * 24 * 60 * 60);
+                setcookie('contract_agreed_value', $value ? '1' : '', $cookieOptions);
             } else {
-                setcookie($field.'_value', $value, time() + 365 * 24 * 60 * 60);
+                setcookie($field.'_value', $value, $cookieOptions);
             }
         }
     }

@@ -74,8 +74,8 @@ class DatabaseRepository {
     
     public function createUser($data) {
         $login = uniqid();
-        $pass = substr(md5(rand()), 0, 8);
-        $pass_hash = md5($pass);
+        $pass = substr(bin2hex(random_bytes(4)), 0, 8);
+        $pass_hash = password_hash($pass, PASSWORD_DEFAULT);
         
         $stmt = $this->db->prepare("
             INSERT INTO application 
@@ -166,7 +166,7 @@ class DatabaseRepository {
         $stmt->execute([$_SERVER['PHP_AUTH_USER']]);
         $admin = $stmt->fetch();
 
-        if (!$admin || md5($_SERVER['PHP_AUTH_PW']) !== $admin['password_hash']) {
+        if (!$admin || !password_verify($_SERVER['PHP_AUTH_PW'], $admin['password_hash'])) {
             header('HTTP/1.1 401 Unauthorized');
             header('WWW-Authenticate: Basic realm="Admin Panel"');
             echo '<h1>401 Неверные учетные данные</h1>';
