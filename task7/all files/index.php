@@ -6,14 +6,13 @@ require_once 'template_helpers.php';
 session_start();
 header('Content-Type: text/html; charset=UTF-8');
 
-// Включим вывод всех ошибок для отладки
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Генерация CSRF-токена
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 $db = new DatabaseRepository();
 
-// Обработка выхода
 if (isset($_GET['logout'])) {
     unset($_SESSION['login'], $_SESSION['uid']);
     $_SESSION['new_session'] = true;
@@ -21,12 +20,9 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-// Обработка GET запроса
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     handleGetRequest($db);
-} 
-// Обработка POST запроса
-elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     handlePostRequest($db);
 }
 
@@ -54,11 +50,14 @@ function handleGetRequest(DatabaseRepository $db) {
     $_SESSION['messages'] = $messages;
     
     include('form.php');
-    exit(); // Важно завершить выполнение после включения формы
+    exit();
 }
 
 function handlePostRequest(DatabaseRepository $db) {
-    // Получаем данные формы
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die('Неверный CSRF-токен');
+    }
+
     $values = [
         'full_name' => $_POST['fio'] ?? '',
         'phone' => $_POST['phone'] ?? '',
@@ -70,13 +69,10 @@ function handlePostRequest(DatabaseRepository $db) {
         'languages' => $_POST['languages'] ?? []
     ];
 
-    // Валидация
     $errors = Validator::validateUserForm($values);
     
-    // Сохраняем валидные поля в куки
     saveValidFieldsToCookies($values, $errors);
     
-    // Если есть ошибки - возвращаем на форму
     if (!empty($errors)) {
         $_SESSION['errors'] = $errors;
         $_SESSION['values'] = $values;
@@ -85,7 +81,6 @@ function handlePostRequest(DatabaseRepository $db) {
     }
 
     try {
-        // Создание или обновление пользователя
         if (empty($_SESSION['login'])) {
             $result = $db->createUser($values);
             
@@ -98,7 +93,8 @@ function handlePostRequest(DatabaseRepository $db) {
                          htmlspecialchars($result['login']) . 
                          '</strong> и паролем <strong>' . 
                          htmlspecialchars($result['pass']) . 
-                         '</strong> для изменения данных.'
+                         '</strong> для изменения данных.',
+                'raw_html' => true
             ]];
         } else {
             $db->updateUser($_SESSION['uid'], $values);
@@ -108,7 +104,8 @@ function handlePostRequest(DatabaseRepository $db) {
         header('Location: index.php');
         exit();
     } catch (Exception $e) {
-        $_SESSION['errors']['general'] = 'Ошибка при сохранении данных: ' . $e->getMessage();
+        error_log("Error saving user data: " . $e->getMessage());
+        $_SESSION['errors']['general'] = 'Ошибка при сохранении данных';
         header('Location: index.php');
         exit();
     }
