@@ -32,9 +32,11 @@ unset($_SESSION['errors'], $_SESSION['values'], $_SESSION['messages']);
         <form action="index.php" method="POST" enctype="multipart/form-data">
             <?php if (!empty($messages)): ?>
                 <div class="messages">
-                    <?php foreach ($messages as $message): ?>
-                        <div class="message"><?= htmlspecialchars($message['html']) ?></div>
-                    <?php endforeach; ?>
+                <?php foreach ($messages as $message): ?>
+                <div class="message">
+                <?= !empty($message['raw_html']) ? $message['html'] : htmlspecialchars($message['html']) ?>
+                </div>
+                <?php endforeach; ?>
                 </div>
             <?php endif; ?>
 

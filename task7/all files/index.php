@@ -41,10 +41,11 @@ function handleGetRequest(DatabaseRepository $db) {
         setcookie('save', '', time() - 3600);
         $messages[] = [
             'html' => 'Вы можете <a href="login.php">войти</a> с логином <strong>' . 
-                      htmlspecialchars($_COOKIE['login']) . 
-                      '</strong> и паролем <strong>' . 
-                      htmlspecialchars($_COOKIE['pass']) . 
-                      '</strong> для изменения данных.'
+                  htmlspecialchars($_COOKIE['login']) . 
+                  '</strong> и паролем <strong>' . 
+                  htmlspecialchars($_COOKIE['pass']) . 
+                  '</strong> для изменения данных.',
+            'raw_html' => true
         ];
     }
 
