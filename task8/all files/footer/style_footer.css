@@ -1,0 +1,236 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.footer-title {
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .footer-title {
+        font-size: 35px;
+        font-weight: bold;
+    }
+}
+
+@media (max-width: 425px) {
+    .footer-title {
+        font-size: 30px;
+        font-weight: bold;
+    }
+}
+
+@media (max-width: 320px) {
+    .footer-title {
+        font-size: 27px;
+        font-weight: bold;
+    }
+}
+
+
+.footer-description {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #c6c6c6;
+}
+
+.icon-small {
+    width: 25px;
+    height: 25px;
+}
+
+.footer-contact {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .footer-contact {
+        font-size: 21px;
+        font-weight: bold;
+    }
+}
+
+@media (max-width: 425px) {
+    .footer-contact {
+        font-size: 19px;
+        font-weight: bold;
+    }
+}
+
+@media (max-width: 320px) {
+    .footer-contact {
+        font-size: 18px;
+        font-weight: bold;
+    }
+}
+
+
+.social-icons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    gap: 1px;
+}
+
+.social-icon {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 250px) {
+    .social-icons {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+
+.footer-icon img {
+    width: 36px;
+    height: 36px;
+    transition: transform 0.2s ease;
+}
+
+.footer-icon img:hover {
+    transform: scale(1.2);
+}
+
+
+.contact-form input,
+.contact-form textarea {
+    background-color: transparent;
+    color: white;
+    border: 1px solid #444;
+    padding: 10px;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+    color: #bbb;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    background-color: transparent;
+    border-color: #f14d34;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #f14d34;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #f14d34;
+}
+
+
+.form-check-input:focus {
+    border-color: #f14d34;
+    box-shadow: none;
+}
+
+.form-check-input:checked {
+    border-color: #f14d34;
+    background-color: transparent;
+}
+
+.form-check-label {
+    color: white;
+    margin-left: 10px;
+}
+
+
+.contact-form input:-webkit-autofill,
+.contact-form textarea:-webkit-autofill {
+    background-color: transparent !important;
+    color: white !important;
+    border: 1px solid #444 !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s, border-color 0.3s ease-in-out;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: #f14d34 !important;
+    outline: none;
+}
+
+.contact-form input:-webkit-autofill:focus,
+.contact-form textarea:-webkit-autofill:focus {
+    border-color: #f14d34 !important;
+}
+
+
+.footer {
+    background: linear-gradient(254.72deg,rgba(255,255,255,.276) -114.85%,rgba(177, 62, 62, 0) 69.04%),#040613;
+    position: relative;
+    color: white;
+    padding: 50px 0;
+    overflow: hidden;
+}
+  
+.footer-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+  
+.footer-image {
+    position: absolute;
+    z-index: 2;
+    max-width: 27%;
+}
+  
+.image-1 {
+    top: 0%;
+    left: 35%;
+}
+  
+.image-2 {
+    bottom: 0;
+    right: 0%;
+}
+  
+.footer-content {
+    position: relative;
+    z-index: 3;
+}
+  
+@media (max-width: 768px) {
+    .footer-image {
+      max-width: 25%;
+    }
+    .image-1 {
+      top: 0%;
+      left: 35%;
+    }
+    .image-2 {
+      bottom: 0%;
+      right: 0%;
+    }
+}
+  
+
+.footer-divider {
+    border-top: 1px solid #666;
+    margin: 0;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.footer-note {
+    font-size: 13px;
+    margin-bottom: 0;
+    text-align: left;
+    margin-left: 0;
+    color: #c6c6c6;
+}

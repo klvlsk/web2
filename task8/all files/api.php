@@ -1,0 +1,121 @@
+<?php
+header('Content-Type: application/json');
+require_once 'DatabaseRepository.php';
+require_once 'Validator.php';
+
+session_start();
+
+$db = new DatabaseRepository();
+$method = $_SERVER['REQUEST_METHOD'];
+
+// Единая точка входа для API
+switch ($method) {
+    case 'POST':
+        handlePostRequest($db);
+        break;
+    case 'PUT':
+        handlePutRequest($db);
+        break;
+    default:
+        http_response_code(405);
+        echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+        break;
+}
+
+function handlePostRequest(DatabaseRepository $db) {
+    // Получаем данные из JSON или формы
+    $contentType = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '';
+    
+    if (strpos($contentType, 'application/json') !== false) {
+        $data = json_decode(file_get_contents('php://input'), true);
+    } else {
+        $data = $_POST;
+        $data['languages'] = isset($_POST['languages']) ? (array)$_POST['languages'] : [];
+        $data['contract_agreed'] = isset($_POST['contract_agreed']);
+    }
+
+    // Валидация
+    $errors = Validator::validateUserForm($data);
+    
+    if (!empty($errors)) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $errors
+        ]);
+        return;
+    }
+    
+    try {
+        // Создание пользователя
+        $result = $db->createUser($data);
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'User created successfully',
+            'login' => $result['login'],
+            'password' => $result['pass']
+        ]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error creating user: ' . $e->getMessage()
+        ]);
+    }
+}
+
+function handlePutRequest(DatabaseRepository $db) {
+    // Проверка авторизации
+    if (empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Authentication required']);
+        return;
+    }
+    
+    $user = $db->checkUserCredentials($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
+    if (!$user) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
+        return;
+    }
+    
+    // Получаем данные из JSON
+    $contentType = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '';
+    if (strpos($contentType, 'application/json') !== false) {
+        $data = json_decode(file_get_contents('php://input'), true);
+    } else {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'JSON data required']);
+        return;
+    }
+    
+    // Валидация
+    $errors = Validator::validateUserForm($data);
+    if (!empty($errors)) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $errors
+        ]);
+        return;
+    }
+    
+    try {
+        // Обновление пользователя
+        $db->updateUser($user['id'], $data);
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'User updated successfully'
+        ]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error updating user: ' . $e->getMessage()
+        ]);
+    }
+}

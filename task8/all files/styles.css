@@ -1,0 +1,136 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: cursive, sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    color: #004b90;
+    background-color: #d4ebff;
+}
+
+main {
+    max-width: 960px;
+    padding: 10px;
+    padding-bottom: 40px;
+    margin: 0 auto;
+    background-color: #d4ebff;
+}
+
+#form {
+    flex: 1;
+    order: 3;
+}
+
+@media screen and (min-width: 800px) {
+    main > .change {
+        flex-direction: column-reverse;
+    }
+}
+
+form {
+    max-width: 550px;
+    margin: 0 auto;
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: cursive, sans-serif;
+}
+
+input[type="radio"], input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+}
+
+input[type="submit"] {
+    background-color: #004b90;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+input[type="submit"]:hover {
+    background-color: #003366;
+}
+
+#messages {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.error {
+    border: 2px solid red;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+#messages .error {
+    color: #c62828;
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+select option:checked {
+    background-color: #004b90;
+    color: white;
+}
+
+input.error, select.error, textarea.error {
+    border-color: red;
+}
+
+.edit-notice {
+    background-color: #ffeb3b;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    padding: 15px;
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+}
+
+.messages {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-left: 4px solid #28a745;
+}
+
+.message {
+    margin: 10px 0;
+    padding: 10px;
+    background: white;
+    border-radius: 4px;
+}
+
+.logout-link {
+    color: #dc3545;
+    margin-left: 10px;
+}

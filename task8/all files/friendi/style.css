@@ -1,0 +1,87 @@
+.working h3 {
+    margin-top: 10%;
+}
+
+.working h2 {
+    text-align: center;
+    color: #4e5a73;
+    font-size: 16px;
+}
+
+.carousel img {
+    max-width: 60%;
+    max-height: 60%;
+}
+
+.carousel {
+    margin: 0 auto;
+    padding: 20px 0;
+    max-width: none;
+    overflow: hidden;
+    display: flex;
+}
+
+.carousel>* {
+    flex: 0 0 100%;
+}
+
+.group {
+    white-space: nowrap;
+    display: flex;
+    gap: 20px;
+    padding-right: 20px;
+    will-change: transform;
+    display: flex;
+    animation: scrolling 90s linear infinite;
+}
+
+.group2 {
+    white-space: nowrap;
+    display: flex;
+    gap: 20px;
+    padding-right: 20px;
+    will-change: transform;
+    display: flex;
+    animation: scrolling2 90s linear infinite;
+}
+
+.card {
+    width: 100%;
+    border-color: #050C33;
+    border-radius: 24px;
+    box-shadow: rgba(0, 0, 0, 10%) 5px 5px 20px 0;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px;
+    min-width: 250px;
+    background: #ffffff;
+}
+
+@keyframes scrolling {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes scrolling2 {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 899px) {
+    .working h2 {
+        text-align: left;
+        padding-left: 3vh;
+    }
+
+}
