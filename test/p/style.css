@@ -1,0 +1,223 @@
+body{
+    font-family:  'Montserrat', sans-serif;
+}
+.container{
+    width: 100%;
+    color: #050613;
+    
+}
+.namer{
+    line-height: 1;
+    font-weight: bold;
+    font-size: 40px;
+    margin-bottom: 20px;
+    margin-top: initial;
+}
+.coment{
+    color: #646b81;
+    font-size:medium;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+.coment h2{
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size:medium;
+}
+.competency{
+    margin-top: 35px;
+    position: relative;
+}
+
+
+
+#i{
+    position: absolute;
+    z-index:-1; 
+    left: -50px;
+    top: 10px;
+    min-width: 30%; 
+    
+}
+
+#i1{
+    position: absolute;
+    z-index:-1; 
+    left: -50px;
+    top: 10px;
+    min-width: 30%; 
+}
+
+
+
+.row {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+.row-flex {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 75px;
+}
+
+
+.advantage {
+    background: #fff;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 5px;
+    box-shadow: 0 20px 40px rgba(5, 12, 51, .15);
+    margin-left: -12px;
+    margin-right: -12px;
+    position:relative;
+    padding: 25px 25px 35px;
+    height: 98%;
+    min-height: 300px;
+    width: 105%;
+}
+.advantage-icon{
+    text-align:end;
+    display: block;
+    max-width: 100%;
+    height:auto;
+    
+}
+
+.advantage-num{
+    font-weight: 700;
+    font-size: 15px;
+    color: #828a9b;
+    margin-bottom: 20px;
+}
+.advantage-title{
+    font-weight: bold;
+    font-size: 20px;
+}
+#h{
+    text-align: center;
+    padding: 10px;
+}
+
+
+.team {
+    padding: 50px 30px 0;
+}
+.members-unit {
+    padding: 0 15px;
+}
+.members-panel {
+    margin-bottom: 20px;
+    font-size: 12px;
+}
+.members-picture {
+    border-radius: 0;
+    max-width: 100%;
+    max-height: 100%;
+    margin-bottom: 15px;
+}
+.pic-adaptive {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+.members-name {
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+    display: inline-block;
+    color: #050c33;
+    line-height: 1.35;
+}
+.members-function {
+    padding: 0;
+    color: #505570;
+    font-weight: 500;
+    line-height: 1.37;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+.all-team {
+    text-align: center;
+    margin-top: 45px;
+    margin-bottom: 30px;
+}
+.all-team a {
+    padding: 10px 30px;
+    display: inline-block;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #050c33;
+    border: 1px solid #cccdd5;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-bottom: 20px;
+}
+@media screen and (min-width: 768px) {
+    .members-unit {
+      padding: 0 50px;
+    }
+    .members-panel {
+      text-align: left;
+      margin-bottom: 70px;
+    }
+    
+    .members-picture {
+      margin-bottom: 25px;
+    }
+    
+    .members-function {
+      font-size: 16px;
+      margin-top: 0px;
+    }
+    
+    .all-team a {
+      padding: 24px 75px;
+    }
+}  
+
+
+
+@media (max-width: 767px) {
+    .row-flex {
+        margin-bottom: 10px;
+    }
+    .col-xs-6{
+        width: 50%;
+    }
+    .namer{
+        font-size: 30px;
+        
+    }
+    .container{
+        margin: 0%;
+    }
+    body{
+        padding: 20px;
+    }
+   
+    .competency{
+        text-align:center;
+    }
+    #i{
+        left: 0;
+    }
+
+    .advantage{
+        min-height: 200px;
+    }
+
+    
+   
+}
+@media (min-width: 425px) {
+        #i1{
+        left: 85px;
+    }
+    #n0{
+        text-align: center;
+    }
+}

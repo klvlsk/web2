@@ -1,0 +1,586 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Montserrat;
+    list-style: none;
+    text-decoration: none;
+}
+
+div.adv {
+    text-align: center;
+}
+
+div.adv h1 {
+    font-weight: revert;
+    font-size: 25px;
+    line-height: 35px;
+    padding-left: 100px;
+    padding-right: 100px;
+}
+
+div.adv p {
+    margin-top: 20px;
+    padding-left: 30px;
+    padding-right: 40px;
+
+}
+
+#logo {
+    margin-top: 10px;
+}
+
+#menu1 {
+    visibility: visible;
+    opacity: 1;
+    float: right;
+    margin-right: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.navbar {
+    overflow: hidden;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 100;
+    display: flex;
+    padding: 0;
+}
+
+.logo-menu {
+    background-color: #000000;
+    width: 100%;
+}
+
+#menu {
+    display: none;
+}
+
+.navbar a {
+    display: block;
+    font-size: 0.8rem;
+    text-align: left;
+    padding: 10px;
+    padding-left: 20px;
+    color: rgb(224, 224, 224);
+}
+
+.m {
+    display: none;
+    background-color: #202020;
+    padding-left: 0;
+}
+
+
+div.cap ul {
+    width: 100%;
+    margin-bottom: 0rem;
+}
+
+div.cap nav {
+    width: 100%;
+}
+
+div.cap ul li {
+    background-color: #000000;
+    margin-top: 0.8px;
+    margin-bottom: 0.8px;
+}
+
+.navbar2,
+.navbar3 {
+    padding-left: 0;
+}
+
+.navbar2 li,
+.navbar3 li {
+    padding-left: 15px;
+}
+
+#admin1,
+#about_us2 {
+    background-color: #000000;
+}
+
+#admin,
+#about_us1 {
+    background: unset;
+}
+
+#menu:checked~ul {
+    transform: scale(1);
+    display: block;
+}
+
+#msup {
+    color: #F14D34;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.page {
+    padding: 0;
+}
+
+header {
+    min-height: 750px;
+    width: 100%;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: white;
+    
+    background-image: url("./drupal-icon.svg");
+    background-repeat: no-repeat;
+    background-size: 90%;
+    background-color: rgba(0, 0, 0, 0.897);
+}
+
+#druplicon {
+    position: absolute;
+    width: 95%;
+    z-index: 0;
+}
+
+header p {
+    color: rgba(204, 204, 204);
+}
+
+header video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+div.adv h1 {
+    padding-top: 30px;
+    margin-top: 0px;
+}
+
+div.ad {
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+    padding-left: 15px;
+}
+
+div.ad div.first_trio {
+    display: flex;
+    flex-direction: column;
+    max-width: 50%;
+    margin-top: 40px;
+
+}
+
+div.ad div.second_trio {
+    display: flex;
+    flex-direction: column;
+    margin-top: 40px;
+}
+
+.advert1,
+.advert {
+    height: 30%;
+    border-left: 5px solid #F14D34;
+    padding: 10px;
+    padding-top: 0;
+    font-size: 12px;
+    margin-bottom: 15px;
+    width: 80%;
+}
+
+header h1 {
+    font-size: 30px;
+}
+
+div.advert1 h1 {
+    float: left;
+    font-size: 40px;
+}
+
+button {
+    border-radius: 5px;
+    border-color: #F14D34;
+    padding: 10px;
+    height: 60px;
+    width: 220px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.315);
+}
+
+@media screen and (min-width: 1000px) {
+    .advert1 {
+        height: 60%;
+    }
+
+    .advert {
+        height: 60%;
+        margin-bottom: 10%;
+    }
+
+    .header-center {
+        display: flex;
+        margin: auto;
+        margin-left: 12%;
+        margin-right: auto;
+        margin-top: 3%;
+        max-width: 900px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    #logo {
+        margin-top: 0px;
+        position: absolute;
+        top: 0;
+        display: block;
+    }
+
+    #menu:checked~ul {
+        transform: scale(1);
+        display: block;
+    }
+
+    .navbar3 {
+        margin-left: -30px;
+    }
+
+    .navbar2,
+    .navbar3 li {
+        padding-left: 10px;
+        padding-top: 5px;
+    }
+
+    .navbar {
+        padding: 0px;
+        overflow: visible;
+        position: relative;
+        top: 0;
+        width: 100%;
+        z-index: 100;
+        display: block;
+    }
+
+    div.cap nav ul li {
+        background-color: #00000000;
+        padding-left: 2%;
+    }
+
+    #m:hover,
+    #m1:hover,
+    #m2:hover,
+    #m3:hover,
+    #msup:hover,
+    #about_us2:hover,
+    #admin1:hover {
+        color: #F14D34;
+    }
+
+    #admin1,
+    #about_us2,
+    .logo-menu {
+        background-color: #00000000;
+    }
+
+    #msup {
+        color: rgb(204, 204, 204);
+    }
+
+    div.cap ul li a {
+        position: relative;
+        color: #F14D34;
+        cursor: pointer;
+        line-height: 1;
+        text-decoration: none;
+    }
+
+    div.cap ul li a:after {
+        display: block;
+        position: absolute;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #F14D34;
+        content: "";
+        transition: width 0.3s ease-out;
+    }
+
+    div.cap ul li a:hover:after,
+    div.cap ul li a:focus:after {
+        width: 100%;
+    }
+
+    div.cap ul li ul li a:hover:after,
+    div.cap ul li ul li a:focus:after {
+        width: 0%;
+    }
+
+    div.cap ul {
+        display: block;
+        width: unset;
+    }
+
+    div.cap .navbar a {
+        font-size: 0.8rem;
+        margin-left: 1rem;
+        color: rgb(204, 204, 204);
+        transition: 0.5s;
+        width: auto;
+        margin: 0px;
+        padding-top: 0;
+        padding-bottom: 0;
+        background-color: #00000000;
+        display: block;
+        padding: 0px;
+    }
+
+    div.cap nav ul li #adm2 {
+        margin-bottom: 0;
+    }
+
+
+    div.cap #menu {
+        display: none;
+    }
+
+    div.cap #menu1 {
+        font-size: 0rem;
+        color: var(--blue);
+        cursor: pointer;
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    header {
+        background-image: url("./drupal-icon.svg");
+        background-repeat: no-repeat;
+        background-size: inherit;
+    }
+
+    header div.cap {
+        display: flex;
+    }
+
+    header div.cap nav {
+        margin-top: 39px;
+    }
+
+    header div.cap nav ul li {
+        position: relative;
+        float: left;
+    }
+
+    header div.cap nav ul li:hover>ul {
+        display: block;
+    }
+
+    header div.cap nav ul li ul {
+        position: absolute;
+        display: none;
+        background-color: #F14D34;
+        z-index: 1;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    header div.cap nav ul li p {
+        margin-bottom: 0;
+        padding-left: 10px;
+        font-size: 18px;
+    }
+
+    #druplicon {
+        position: absolute;
+        width: fit-content;
+    }
+
+    header div.cap nav ul li ul li {
+        width: 100%;
+        border: 1px solid rgba(0, 0, 0, 0);
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    header div.cap nav ul li ul li a {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+
+    header div.cap nav ul li ul li:hover {
+        background-color: #b82e00da;
+        text-decoration: none;
+    }
+
+    .drupal-support-menu {
+        border-bottom: 3px solid #e13800;
+        margin-right: 10px;
+        margin-left: 170px !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important
+    }
+
+    div.cap {
+        max-width: 1220px;
+        margin: auto;
+    }
+
+    header {
+        min-height: 650px;
+    }
+
+    .header-center {
+        display: flex;
+        max-width: 1220px;
+        margin: auto;
+        margin-top: 8.3%;
+    }
+
+    div.adv {
+        max-height: 306px;
+        float: left;
+        text-align: left;
+    }
+
+    div.adv h1 {
+        font-weight: 1000;
+        font-size: 52px;
+        line-height: 60px;
+        display: flex;
+        align-items: center;
+        padding-left: 0px;
+        padding-right: 0px;
+        margin-top: 0px;
+        max-width: 90%;
+    }
+
+    div.adv p {
+        margin-top: 15px;
+        padding-left: 0px;
+        padding-right: 0px;
+        max-width: 90%;
+    }
+
+    div.adv button {
+        margin-top: 55px;
+    }
+
+    div.ad {
+        margin-left: 0;
+        display: flex;
+        flex-direction: row;
+        margin-top: 5%;
+    }
+
+    div.ad div.first_trio {
+        display: flex;
+        flex-direction: column;
+        max-width: none;
+        height: 30%;
+        margin-top: 0px;
+        margin-bottom: 15px;
+    }
+
+    div.ad div.second_trio {
+        display: flex;
+        flex-direction: column;
+        height: 30%;
+        margin-top: 0px;
+    }
+
+    .advert1,
+    .advert,
+    .advert p {
+        min-height: 80%;
+    }
+}
+
+@media screen and (min-width: 1600px) {
+    .advert1 img {
+        position: absolute;
+        top: -13%;
+        left: 30%;
+    }
+
+    .header-center {
+        display: flex;
+        margin: auto;
+        margin-left: 25%;
+        margin-right: auto;
+        margin-top: 3%;
+        max-width: 900px;
+    }
+
+    div.ad {
+        margin-left: 20px;
+        display: flex;
+        flex-direction: column;
+        margin-top: 5%;
+    }
+
+    div.ad div.first_trio,
+    div.ad div.second_trio {
+        display: flex;
+        flex-direction: row;
+        max-width: 250px;
+        height: 50%;
+        margin-top: 0px;
+        margin-bottom: 15px;
+    }
+
+    div.ad div.second_trio {
+        display: flex;
+        flex-direction: row;
+        height: 50%;
+        margin-top: 0px;
+    }
+
+
+    div.advert1 h1 {
+        float: none;
+    }
+
+    .advert1,
+    .advert,
+    .advert p {
+        min-height: 80%;
+    }
+
+    .advert1 p {
+        margin-bottom: 0;
+        max-width: 80%;
+    }
+}
+
+
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url("./Fonts/Montserrat-Regular.ttf") format("truetype");
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url("./Fonts/Montserrat-Bold.ttf") format("truetype");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url("./Fonts/Montserrat-Medium.ttf") format("truetype");
+    font-weight: 500;
+}

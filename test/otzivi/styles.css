@@ -1,0 +1,234 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+#testimonials.slick-prev,
+#testimonials.slick-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 10;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+#testimonials h2 {
+    font-weight: 700;
+    font-size: 42px;
+    margin-bottom: 106px;
+    margin-top: 100px;
+    text-align: center;
+    color: #050c33;
+}
+
+#testimonials .content {
+    width: 980px;
+    max-width: 100%;
+    margin: auto;
+    margin-top: 74px;
+    position: relative;
+}
+
+#testimonials .content:before,
+#testimonials .content:after {
+    content: "";
+    border: 1px solid rgba(0, 0, 0, .1);
+    box-shadow: 0px 4px 60px rgba(162, 162, 162, .25);
+    position: absolute;
+    left: 64px;
+    right: 64px;
+}
+
+#testimonials .content:before {
+    top: -40px;
+    bottom: 0;
+    opacity: .7;
+    border-radius: 5px;
+}
+
+#testimonials .content:after {
+    background: #fff;
+    opacity: .34;
+    border-radius: 5px;
+    top: -72px;
+    bottom: 0;
+    left: 128px;
+    right: 128px;
+}
+
+#testimonials .slick {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 10;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, .1);
+    box-shadow: 0px 4px 60px rgba(162, 162, 162, .25);
+    border-radius: 5px;
+    padding: 66px 0 66px 68px;
+}
+
+#testimonials .slick-slider {
+    width: 64%;
+    float: left;
+    padding-right: 60px;
+    border-right: 1px solid #cdcdcd;
+    padding: 14px 60px;
+}
+
+#testimonials .arrow {
+    width: 36%;
+    float: left;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#testimonials .arrow-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#testimonials .slide-num {
+    display: inline-block;
+    margin: 0 20px;
+    font-size: 28px;
+    vertical-align: middle;
+    color: #e0e0e0;
+}
+
+#testimonials .logo img {
+    margin: 0 0 40px;
+}
+
+#testimonials .report-text {
+    margin-bottom: 28px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+    color: #050c33;
+    outline: none;
+}
+
+#testimonials .report-author {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.2;
+    color: #838b9c;
+}
+
+#testimonials .report-text a,
+#testimonials .report-author a {
+    color: #050c33;
+    outline: none;
+    font-weight: 400;
+}
+
+#testimonials .slide-num-digit:nth-child(-n+2) {
+    color: #050c33;
+}
+
+.slick-prev,
+.slick-next {
+    position: static;
+    transform: none;
+    margin: 0 10px;
+    border: none;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: block !important;
+    outline: none;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+}
+
+.slick-prev,
+.slick-prev:hover,
+.slick-prev:focus,
+.slick-prev:active {
+    background-image: url('arrow-left.jpg') !important;
+}
+
+.slick-next,
+.slick-next:hover,
+.slick-next:focus,
+.slick-next:active {
+    background-image: url('arrow-right.jpg') !important;
+}
+
+.slick-prev:before,
+.slick-next:before {
+    content: none;
+}
+
+@media (max-width: 899px) {
+    #testimonials {
+        margin-bottom: 110px;
+        padding-top: 35px;
+    }
+
+    #testimonials .content {
+        margin-top: 48px;
+    }
+
+    #testimonials .content:after {
+        left: 68px;
+        right: 68px;
+        top: -48px;
+    }
+
+    #testimonials .content:before {
+        left: 34px;
+        right: 34px;
+        top: -25px;
+    }
+
+    #testimonials .slick {
+        display: block;
+        padding: 15px;
+    }
+
+    #testimonials .slick-slider,
+    #testimonials .arrow {
+        width: 100%;
+        float: none;
+        display: block;
+        padding: 20px 15px;
+        border: none;
+    }
+
+
+    #testimonials .arrow {
+        text-align: center;
+        border-top: 1px solid #cdcdcd;
+    }
+
+    #testimonials .arrow-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .slick-slider {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .arrow {
+        order: 1;
+        margin-top: 20px;
+    }
+
+    .slick-prev,
+    .slick-next {
+        position: static;
+        transform: none;
+        margin: 0 10px;
+    }
+}

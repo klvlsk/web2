@@ -1,0 +1,283 @@
+body {
+    font-family: 'Montserrat';
+    font-weight: 500;
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+  }
+  
+  
+  .last-cases h2 {
+    display: block;
+    font-size: 1.5em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+    unicode-bidi: isolate;
+}
+  
+  .for_h3 {
+    font-weight: bold;
+    color: #050c33;
+    font-size: 16px;
+  }
+
+  @media (max-width: 1024px) {
+    .for_h3 {
+      font-size: 14px !important;
+      margin-left: 3% !important;
+    }
+    .case-text {
+      font-size: 14px !important;
+      margin-left: 3% !important;
+    }
+    .case-post-date {
+      margin-left: 3% !important;
+    }
+  }
+
+  
+  .last-cases-table {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .case-block {
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    width: 100%;
+    font-size: 14px;
+    color: #4e5a73;
+    position: relative;
+    cursor: pointer;
+    margin: 0;
+    text-decoration: none;
+  }
+  
+  .case-block:hover {
+    text-decoration: none;
+    color: #4e5a73;
+  }
+  
+  .case-block h3 {
+    margin-top: 20px;
+    font-weight: bold;
+    width: 280px;  
+    font-size: 12px;
+    margin-left: 15px; 
+    line-height: 15px;
+    text-decoration: none;
+  }
+  
+  .case-block h3:hover {
+    text-decoration: underline;
+  }
+  
+  .case-pic {
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    border-radius: 5px;
+    height: 125px;
+  }
+
+  
+  .case-post-date {
+    opacity: 50%;
+    margin-left: 15px;
+    font-size: 12px;
+    line-height: 15px;
+  }
+  
+  
+  .last-cases h2,
+  .reviews h2,
+  .faq h2{
+    text-align: center;
+  }
+
+  .last-cases h2{
+    font-size: 22px;
+  }
+
+  .case-text { 
+    margin-top: 15px;
+    margin-left: 15px;
+    margin-right: 40px;
+    margin-bottom: 10px;
+    width: 300px; 
+    word-wrap: break-word;
+    font-size:10px;
+    line-height: 15px;
+  }
+
+  .last-cases h2,
+.reviews h2,
+.faq h2{
+  text-align: center;
+}
+
+
+
+.case-post-date{
+  font-size: 10px;
+}
+
+.case-block h3,
+.case-post-date,
+.case-text {
+  margin-left: 15px;
+  margin-right: 15px;
+  z-index: 5;
+}
+  
+  .case-href {
+    color: #337ab7;
+    text-decoration: none;
+  }
+  
+  .case-href:hover {
+    color: #23527c;
+    text-decoration: underline;
+  }
+  
+  .fullscreen-case {
+    position: relative;
+    color: #fff;
+    margin-bottom: 0px;
+  }
+  
+  .fullscreen-case::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    background: linear-gradient(360deg, rgba(0, 0, 0, .5) 0, rgba(0, 0, 0, 0) 50%);
+    z-index: 5;
+    border-radius: 5px;
+  }
+  
+  .fullscreen-case h3 {
+    color: #fff;
+    font-size: 13px;
+    margin-top: 155px;
+    margin-left: 15px;
+    margin-right: 0;
+    width: 310px;
+    max-width: 100%;
+  }
+  
+  .fullscreen-case .case-post-date {
+    margin-left: 15px;
+    margin-bottom: 10px;
+    margin-right: 0;
+  }
+  
+  .fullscreen-case:hover {
+    color: #fff;
+  }
+  
+  .fullscreen-case .case-pic {
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    height: auto;
+    width: auto;
+  }
+
+
+  
+  
+  @media screen and (min-width: 768px) {
+    .last-cases h2 {
+      font-size: 35px;
+    }
+
+    .case-block {
+      min-height: 460px;
+      width: 33.3%;
+    }
+    
+    .case-pic{
+      height: 180px;
+    }
+
+    .case-block:nth-child(2) {
+      min-height: 460px;
+      width: 66.6%;
+    }
+    
+    .case-block h3{
+      font-size: 16px;
+      margin-top: 40px;
+      margin-left: 40px;
+      font-size: 18px;
+      line-height: 20.94px; 
+    }
+
+    .case-post-date{
+      margin-left: 40px;
+      margin-right: 15px;
+      font-size: 10px;
+    }
+
+    .case-text{
+      margin-left: 40px;
+      margin-right: 15px;
+      font-size: 14px;
+      line-height: 15px;
+      text-align: left;
+    }
+
+    .case-pic h3{
+      font-size: 16px;
+      margin-left: 40px;
+      margin-right: 15px;
+    }
+    
+    .fullscreen-case h3 {
+      font-size: 16px;
+      width: 300px;
+      margin-top: 350px;
+      margin-left: 40px;
+      font-weight: bold;
+      line-height: 21.94px; 
+      word-wrap: break-word; 
+      text-align: left; 
+    }
+
+    .fullscreen-case .case-post-date{
+      margin-left: 40px;
+      margin-top: 5px;
+      margin-bottom: 40px;
+    }
+    .case-block .case-pic{
+      height: 190px;
+    }
+    .fullscreen-case .case-pic {
+      position: absolute;
+      top: 10px;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      height: auto;
+      width: auto;
+    }
+  }
+  
+  @media screen and (min-width: 1200px) {
+    .case-pic {
+      height: 50%;
+    }
+  }
+  

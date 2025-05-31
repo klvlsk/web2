@@ -1,0 +1,91 @@
+* {
+    font-family:'Montserrat';
+}
+
+h3 {
+    text-align: center;
+    color:#050613;
+    font-size: 40px;
+    font-weight: 700;
+}
+
+.FAQ {
+    margin-top: 10%;
+    margin-right: auto;
+    margin-left: auto;
+    padding-left: 3vh;
+    padding-right: 3vh;
+}
+
+.accordion {
+    color:#050C33;
+    padding-bottom: 50px;
+    --bs-accordion-border-color: #ffffff;
+}
+
+.accordion-header {
+    color:#050C33;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease;
+    display: flex;
+}
+
+.accordion-content {
+    padding: 0 20px; 
+    max-height: 0; 
+    overflow: hidden;
+    background-color: #ffffff;
+    font-size: 16px;
+    transition: max-height 0.3s ease; 
+}
+
+.accordion-item.active {
+    border: 3px solid #f14d34;
+
+}
+.accordion-item.active #p-2 {
+    color:#f14d34;
+}
+
+.accordion-header h3 {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: left;
+}
+
+.accordion p {
+    color:#4e5a73;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.accordion-num {
+    color:#4e5a73d8;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+@media screen and (min-width: 992px){
+    .FAQ {
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 10%;
+        padding-right: 10%;
+    }
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url( "./Fonts/Montserrat-Regular.ttf") format("truetype");
+    font-weight: normal;
+}
+@font-face {
+    font-family: 'Montserrat';
+    src: url( "./Fonts/Montserrat-Bold.ttf") format("truetype");
+    font-weight: bold;
+}
+@font-face {
+    font-family: 'Montserrat';
+    src: url( "./Fonts/Montserrat-Medium.ttf") format("truetype");
+    font-weight: 500;
+}
