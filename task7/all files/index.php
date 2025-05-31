@@ -6,11 +6,6 @@ require_once 'template_helpers.php';
 session_start();
 header('Content-Type: text/html; charset=UTF-8');
 
-// Включим вывод всех ошибок для отладки
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 $db = new DatabaseRepository();
 
 // Обработка выхода
