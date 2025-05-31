@@ -5,9 +5,6 @@ html, body {
     font-family: cursive, sans-serif;
     background-color: #d4ebff;
     color: #004b90;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .error-message {
