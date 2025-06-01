@@ -922,7 +922,8 @@ if ($isEditMode && $login && $password) {
                 </div>
 
                 <div class="col-lg-6 col-md-12">
-                    <form id="application-form" method="POST" action="api.php" enctype="multipart/form-data">
+                    <!-- В index.php замените блок формы на этот: -->
+<form id="application-form" method="POST" action="api.php" enctype="multipart/form-data">
     <?php if ($isEditMode): ?>
         <div class="edit-notice mb-3">
             Режим редактирования. Вы можете изменить свои данные.
@@ -985,6 +986,7 @@ if ($isEditMode && $login && $password) {
             <?php endforeach; ?>
         </select>
         <div class="error-message" id="languages_error"></div>
+        <small class="text-white">Удерживайте Ctrl для выбора нескольких языков</small>
     </div>
     
     <div class="mb-2">
