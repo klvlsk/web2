@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
             email: formData.get('email'),
             birth_date: formData.get('birth_date'),
             gender: formData.get('gender'),
-            languages: Array.from(formData.getAll('languages')),
+            languages: Array.from(document.querySelectorAll('#languages option:checked')).map(opt => opt.value),
             biography: formData.get('biography'),
             contract_agreed: formData.get('contract_agreed') === 'on'
         };

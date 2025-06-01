@@ -23,7 +23,7 @@ class Validator {
             $errors['gender'] = 'Выберите пол.';
         }
         
-        if (empty($data['languages']) || !is_array($data['languages'])) {
+        if (empty($data['languages']) || !is_array($data['languages']) || count($data['languages']) == 0) {
             $errors['languages'] = 'Выберите хотя бы один язык программирования.';
         }
         
