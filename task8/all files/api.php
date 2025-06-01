@@ -104,12 +104,13 @@ function handlePostRequest(DatabaseRepository $db, $data, $responseType) {
     try {
         $result = $db->createUser($data);
         
+        // Изменяем URL для перехода на страницу логина
         sendResponse(200, [
             'success' => true,
             'message' => 'User created successfully',
             'login' => $result['login'],
             'password' => $result['pass'],
-            'profile_url' => 'index.php?login=' . urlencode($result['login'])
+            'profile_url' => 'login.php?login=' . urlencode($result['login']) . '&pass=' . urlencode($result['pass'])
         ], $responseType);
     } catch (Exception $e) {
         sendResponse(500, [

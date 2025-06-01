@@ -96,32 +96,75 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function createUser(data, contentType) {
-        const body = contentType === 'application/xml' ? dataToXml(data) : JSON.stringify(data);
-        
-        fetch('api.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': contentType,
-                'Accept': contentType
-            },
-            body: body
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return contentType === 'application/xml' ? parseXmlResponse(response) : response.json();
-        })
-        .then(response => {
-            if (response.success) {
-                showSuccess(response);
-            } else {
-                showErrors(response.errors || { message: response.message });
+    const body = contentType === 'application/xml' ? dataToXml(data) : JSON.stringify(data);
+    
+    fetch('api.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': contentType,
+            'Accept': contentType
+        },
+        body: body
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(text || 'Network response was not ok');
+            });
+        }
+        return contentType === 'application/xml' ? parseXmlResponse(response) : response.json();
+    })
+    .then(response => {
+        if (response.success) {
+            showSuccess(response);
+            // Добавляем кнопку выхода
+            addLogoutButton();
+        } else {
+            showErrors(response.errors || { message: response.message });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        try {
+            // Пытаемся распарсить XML ошибку
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(error.message, "application/xml");
+            const errorNode = xmlDoc.querySelector('parsererror');
+            if (!errorNode) {
+                const message = xmlDoc.getElementsByTagName('message')[0]?.textContent;
+                showMessage(message || 'Ошибка сервера', 'error');
+                return;
             }
-        })
-        .catch(error => {
-            showMessage('Ошибка сети: ' + error.message, 'error');
-            console.error('Error:', error);
-        });
-    }
+        } catch (e) {
+            console.log('Not XML error');
+        }
+        
+        // Показываем обычное сообщение об ошибке
+        showMessage('Ошибка сети: ' + error.message, 'error');
+    });
+}
+
+function addLogoutButton() {
+    const logoutBtn = document.createElement('a');
+    logoutBtn.href = 'index.php?logout=1';
+    logoutBtn.className = 'btn btn-secondary mt-2';
+    logoutBtn.textContent = 'Выйти';
+    resultDiv.appendChild(logoutBtn);
+}
+
+function dataToXml(data) {
+    let xml = '<user>';
+    xml += `<full_name>${escapeXml(data.full_name)}</full_name>`;
+    xml += `<phone>${escapeXml(data.phone)}</phone>`;
+    xml += `<email>${escapeXml(data.email)}</email>`;
+    xml += `<birth_date>${escapeXml(data.birth_date)}</birth_date>`;
+    xml += `<gender>${escapeXml(data.gender)}</gender>`;
+    xml += `<languages>${data.languages.join(',')}</languages>`;
+    xml += `<biography>${escapeXml(data.biography)}</biography>`;
+    xml += `<contract_agreed>${data.contract_agreed}</contract_agreed>`;
+    xml += '</user>';
+    return xml;
+}
     
     function updateUser(data, login, contentType) {
         const password = prompt('Введите ваш пароль для подтверждения:');
@@ -158,19 +201,6 @@ document.addEventListener('DOMContentLoaded', function() {
             showMessage('Ошибка сети: ' + error.message, 'error');
             console.error('Error:', error);
         });
-    }
-    
-    function dataToXml(data) {
-        let xml = '<user>';
-        for (const key in data) {
-            if (Array.isArray(data[key])) {
-                xml += `<${key}>${data[key].join(',')}</${key}>`;
-            } else {
-                xml += `<${key}>${escapeXml(data[key])}</${key}>`;
-            }
-        }
-        xml += '</user>';
-        return xml;
     }
     
     function escapeXml(unsafe) {

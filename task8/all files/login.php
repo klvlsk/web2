@@ -3,16 +3,32 @@ require_once 'DatabaseRepository.php';
 
 session_start();
 
-// Если пользователь уже авторизован, перенаправляем на главную
-if (!empty($_SESSION['user'])) {
-    header('Location: index.php?login=' . urlencode($_SESSION['user']['login']));
-    exit();
-}
-
 // Обработка выхода
 if (isset($_GET['logout'])) {
     session_destroy();
     header('Location: index.php');
+    exit();
+}
+
+// Если есть параметры логина и пароля в URL
+if (isset($_GET['login']) && isset($_GET['pass'])) {
+    $login = $_GET['login'];
+    $pass = $_GET['pass'];
+    
+    // Сохраняем в сессии для отображения в форме
+    $_SESSION['login_params'] = [
+        'login' => $login,
+        'pass' => $pass
+    ];
+    
+    // Перенаправляем без параметров
+    header('Location: login.php');
+    exit();
+}
+
+// Если пользователь уже авторизован
+if (!empty($_SESSION['user'])) {
+    header('Location: index.php?login=' . urlencode($_SESSION['user']['login']));
     exit();
 }
 
@@ -31,13 +47,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'full_name' => $user['full_name']
             ];
             
-            // Перенаправляем на страницу с формой в режиме редактирования
             header('Location: index.php?login=' . urlencode($user['login']));
             exit();
         } else {
             $error_message = 'Неверный логин или пароль';
         }
     }
+}
+
+// Получаем сохраненные параметры логина/пароля
+$login_value = '';
+$pass_value = '';
+if (isset($_SESSION['login_params'])) {
+    $login_value = htmlspecialchars($_SESSION['login_params']['login']);
+    $pass_value = htmlspecialchars($_SESSION['login_params']['pass']);
+    unset($_SESSION['login_params']);
 }
 ?>
 
@@ -53,8 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="login-container">
         <h1>Вход в систему</h1>
         <form method="post">
-            <input type="text" name="login" placeholder="Логин" required>
-            <input type="password" name="pass" placeholder="Пароль" required>
+            <input type="text" name="login" placeholder="Логин" required value="<?= $login_value ?>">
+            <input type="password" name="pass" placeholder="Пароль" required value="<?= $pass_value ?>">
             <input type="submit" value="Войти">
         </form>
         <?php if (!empty($error_message)): ?>
