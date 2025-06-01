@@ -1,5 +1,4 @@
 <?php
-header('Content-Type: application/json');
 require_once 'DatabaseRepository.php';
 require_once 'Validator.php';
 
@@ -7,143 +6,186 @@ session_start();
 
 $db = new DatabaseRepository();
 $method = $_SERVER['REQUEST_METHOD'];
-$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+$contentType = $_SERVER['CONTENT_TYPE'] ?? 'application/json';
 
-// Единая точка входа для API
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$pathParts = explode('/', $path);
-$resource = $pathParts[count($pathParts) - 2]; // api.php/{resource}
-$resourceId = $pathParts[count($pathParts) - 1] ?? null;
+// Определяем тип ответа
+$acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? 'application/json';
+$responseType = strpos($acceptHeader, 'application/xml') !== false ? 'xml' : 'json';
 
-// Определяем тип контента и парсим данные
+// Парсим входные данные
+$input = file_get_contents('php://input');
+$data = [];
+
 if ($method === 'POST' || $method === 'PUT') {
-    $input = file_get_contents('php://input');
-    
     if (strpos($contentType, 'application/xml') !== false) {
-        $data = simplexml_load_string($input);
-        if ($data === false) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Invalid XML data']);
+        try {
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($input);
+            if ($xml === false) {
+                throw new Exception('Invalid XML: ' . libxml_get_last_error()->message);
+            }
+            $data = json_decode(json_encode($xml), true);
+        } catch (Exception $e) {
+            sendResponse(400, [
+                'success' => false,
+                'message' => $e->getMessage()
+            ], $responseType);
             exit;
         }
-        $data = json_decode(json_encode($data), true);
     } else {
         $data = json_decode($input, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Invalid JSON data']);
+            sendResponse(400, [
+                'success' => false,
+                'message' => 'Invalid JSON data'
+            ], $responseType);
             exit;
         }
     }
 }
 
+// Обработка запросов
 switch ($method) {
     case 'GET':
-        handleGetRequest($db, $resourceId);
+        handleGetRequest($db, $_GET, $responseType);
         break;
     case 'POST':
-        handlePostRequest($db, $data);
+        handlePostRequest($db, $data, $responseType);
         break;
     case 'PUT':
-        handlePutRequest($db, $resourceId, $data);
+        handlePutRequest($db, $data, $responseType);
         break;
     default:
-        http_response_code(405);
-        echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+        sendResponse(405, [
+            'success' => false,
+            'message' => 'Method not allowed'
+        ], $responseType);
         break;
 }
 
-function handleGetRequest(DatabaseRepository $db, $userId) {
-    if (empty($userId)) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'User ID is required']);
+function handleGetRequest(DatabaseRepository $db, $params, $responseType) {
+    if (empty($params['login'])) {
+        sendResponse(400, [
+            'success' => false,
+            'message' => 'Login parameter is required'
+        ], $responseType);
         return;
     }
 
-    $user = $db->getUser($userId);
+    $user = $db->getUserByLogin($params['login']);
     if (!$user) {
-        http_response_code(404);
-        echo json_encode(['success' => false, 'message' => 'User not found']);
+        sendResponse(404, [
+            'success' => false,
+            'message' => 'User not found'
+        ], $responseType);
         return;
     }
 
     $user['languages'] = $db->getUserLanguages($user['id']);
     unset($user['pass']);
     
-    echo json_encode([
+    sendResponse(200, [
         'success' => true,
         'data' => $user
-    ]);
+    ], $responseType);
 }
 
-function handlePostRequest(DatabaseRepository $db, $data) {
+function handlePostRequest(DatabaseRepository $db, $data, $responseType) {
     $errors = Validator::validateUserForm($data);
     if (!empty($errors)) {
-        http_response_code(400);
-        echo json_encode([
+        sendResponse(400, [
             'success' => false,
             'message' => 'Validation failed',
             'errors' => $errors
-        ]);
+        ], $responseType);
         return;
     }
     
     try {
         $result = $db->createUser($data);
         
-        echo json_encode([
+        sendResponse(200, [
             'success' => true,
             'message' => 'User created successfully',
             'login' => $result['login'],
             'password' => $result['pass'],
             'profile_url' => 'index.php?login=' . urlencode($result['login'])
-        ]);
+        ], $responseType);
     } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode([
+        sendResponse(500, [
             'success' => false,
             'message' => 'Error creating user: ' . $e->getMessage()
-        ]);
+        ], $responseType);
     }
 }
 
-function handlePutRequest(DatabaseRepository $db, $userId, $data) {
+function handlePutRequest(DatabaseRepository $db, $data, $responseType) {
     if (empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) {
-        http_response_code(401);
-        echo json_encode(['success' => false, 'message' => 'Authentication required']);
+        sendResponse(401, [
+            'success' => false,
+            'message' => 'Authentication required'
+        ], $responseType);
         return;
     }
     
     $user = $db->checkUserCredentials($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
-    if (!$user || $user['id'] != $userId) {
-        http_response_code(403);
-        echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
+    if (!$user) {
+        sendResponse(403, [
+            'success' => false,
+            'message' => 'Invalid credentials'
+        ], $responseType);
         return;
     }
     
     $errors = Validator::validateUserForm($data);
     if (!empty($errors)) {
-        http_response_code(400);
-        echo json_encode([
+        sendResponse(400, [
             'success' => false,
             'message' => 'Validation failed',
             'errors' => $errors
-        ]);
+        ], $responseType);
         return;
     }
     
     try {
-        $db->updateUser($userId, $data);
+        $db->updateUser($user['id'], $data);
         
-        echo json_encode([
+        sendResponse(200, [
             'success' => true,
             'message' => 'User updated successfully'
-        ]);
+        ], $responseType);
     } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode([
+        sendResponse(500, [
             'success' => false,
             'message' => 'Error updating user: ' . $e->getMessage()
-        ]);
+        ], $responseType);
     }
+}
+
+function sendResponse($statusCode, $data, $type = 'json') {
+    http_response_code($statusCode);
+    
+    if ($type === 'xml') {
+        header('Content-Type: application/xml');
+        echo arrayToXml($data);
+    } else {
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
+}
+
+function arrayToXml($data, $rootNode = 'response') {
+    $xml = '<?xml version="1.0"?>';
+    $xml .= "<$rootNode>";
+    
+    foreach ($data as $key => $value) {
+        if (is_array($value)) {
+            $xml .= arrayToXml($value, $key);
+        } else {
+            $xml .= "<$key>" . htmlspecialchars($value) . "</$key>";
+        }
+    }
+    
+    $xml .= "</$rootNode>";
+    return $xml;
 }

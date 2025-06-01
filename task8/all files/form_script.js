@@ -1,24 +1,23 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('application-form');
     const resultDiv = document.getElementById('form-result');
+    const contentTypeSelect = document.getElementById('content-type');
 
-     // Добавляем скрытое поле для определения отключенного JavaScript
+    // Добавляем скрытое поле для определения отключенного JavaScript
     const noJsField = document.createElement('input');
     noJsField.type = 'hidden';
     noJsField.name = 'nojs';
     noJsField.value = '0';
-    document.getElementById('application-form').appendChild(noJsField);
-    
-    // Проверяем, есть ли данные для редактирования
+    form.appendChild(noJsField);
+
+    // Проверяем параметры URL
     const urlParams = new URLSearchParams(window.location.search);
     const login = urlParams.get('login');
     const logout = urlParams.get('logout');
     
     if (logout === '1') {
-        // Очищаем параметры URL без перезагрузки
         history.replaceState(null, '', window.location.pathname);
     } else if (login) {
-        // Загружаем данные пользователя для редактирования
         loadUserData(login);
     }
     
@@ -26,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const formData = new FormData(form);
+        const contentType = contentTypeSelect.value;
         const selectedLanguages = Array.from(form.querySelectorAll('#languages option:checked')).map(opt => opt.value);
         
         const data = {
@@ -44,11 +44,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (login) {
-            // Редактирование существующего пользователя
-            updateUser(data, login);
+            updateUser(data, login, contentType);
         } else {
-            // Создание нового пользователя
-            createUser(data);
+            createUser(data, contentType);
         }
     });
     
@@ -65,178 +63,180 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (response.success) {
-                const user = response.data;
-                // Заполняем форму данными пользователя
-                form.elements.full_name.value = user.full_name || '';
-                form.elements.phone.value = user.phone || '';
-                form.elements.email.value = user.email || '';
-                form.elements.birth_date.value = user.birth_date || '';
-                
-                if (user.gender) {
-                    const genderRadio = form.querySelector(`input[name="gender"][value="${user.gender}"]`);
-                    if (genderRadio) genderRadio.checked = true;
-                }
-                
-                if (user.languages) {
-                    Array.from(form.elements['languages[]'].options).forEach(option => {
-                        option.selected = user.languages.includes(parseInt(option.value));
-                    });
-                }
-                
-                form.elements.biography.value = user.biography || '';
-                form.elements.contract_agreed.checked = user.contract_agreed || false;
-                
-                resultDiv.textContent = 'Режим редактирования. Вы можете изменить свои данные.';
-                resultDiv.className = 'result info';
+                fillForm(response.data);
+                showMessage('Режим редактирования. Вы можете изменить свои данные.', 'info');
             } else {
                 throw new Error(response.message || 'Failed to load user data');
             }
         })
         .catch(error => {
-            resultDiv.textContent = 'Ошибка загрузки данных: ' + error.message;
-            resultDiv.className = 'result error';
+            showMessage('Ошибка загрузки данных: ' + error.message, 'error');
         });
     }
     
-    function getRequestData(data, contentType) {
-        if (contentType === 'application/xml') {
-            let xml = '<user>';
-            for (const key in data) {
-                if (Array.isArray(data[key])) {
-                    xml += `<${key}>${data[key].join(',')}</${key}>`;
-                } else {
-                    xml += `<${key}>${data[key]}</${key}>`;
-                }
-            }
-            xml += '</user>';
-            return xml;
+    function fillForm(user) {
+        form.elements.full_name.value = user.full_name || '';
+        form.elements.phone.value = user.phone || '';
+        form.elements.email.value = user.email || '';
+        form.elements.birth_date.value = user.birth_date || '';
+        
+        if (user.gender) {
+            const genderRadio = form.querySelector(`input[name="gender"][value="${user.gender}"]`);
+            if (genderRadio) genderRadio.checked = true;
         }
-        return JSON.stringify(data);
+        
+        if (user.languages) {
+            Array.from(form.elements['languages[]'].options).forEach(option => {
+                option.selected = user.languages.includes(parseInt(option.value));
+            });
+        }
+        
+        form.elements.biography.value = user.biography || '';
+        form.elements.contract_agreed.checked = user.contract_agreed || false;
     }
-
-    function createUser(data) {
-        const contentType = document.getElementById('content-type').value || 'application/json';
-        const body = getRequestData(data, contentType);
+    
+    function createUser(data, contentType) {
+        const body = contentType === 'application/xml' ? dataToXml(data) : JSON.stringify(data);
         
         fetch('api.php', {
             method: 'POST',
             headers: {
                 'Content-Type': contentType,
+                'Accept': contentType
             },
             body: body
         })
         .then(response => {
-            if (contentType === 'application/xml') {
-                return response.text().then(text => {
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(text, "application/xml");
-                    return {
-                        success: xmlDoc.getElementsByTagName('success')[0].textContent === 'true',
-                        message: xmlDoc.getElementsByTagName('message')[0].textContent,
-                        login: xmlDoc.getElementsByTagName('login')[0]?.textContent,
-                        password: xmlDoc.getElementsByTagName('password')[0]?.textContent,
-                        profile_url: xmlDoc.getElementsByTagName('profile_url')[0]?.textContent
-                    };
-                });
-            }
-            return response.json();
+            if (!response.ok) throw new Error('Network response was not ok');
+            return contentType === 'application/xml' ? parseXmlResponse(response) : response.json();
         })
         .then(response => {
             if (response.success) {
-                // Обработка успешного создания пользователя
+                showSuccess(response);
             } else {
                 showErrors(response.errors || { message: response.message });
             }
         })
         .catch(error => {
+            showMessage('Ошибка сети: ' + error.message, 'error');
             console.error('Error:', error);
-            resultDiv.textContent = 'Ошибка сети. Попробуйте позже.';
-            resultDiv.className = 'result error';
         });
     }
     
-    function updateUser(data, login) {
+    function updateUser(data, login, contentType) {
         const password = prompt('Введите ваш пароль для подтверждения:');
         if (!password) return;
+        
+        const body = contentType === 'application/xml' ? dataToXml(data) : JSON.stringify(data);
         
         fetch('api.php', {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': contentType,
+                'Accept': contentType,
                 'Authorization': 'Basic ' + btoa(login + ':' + password)
             },
-            body: JSON.stringify(data)
+            body: body
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return contentType === 'application/xml' ? parseXmlResponse(response) : response.json();
+        })
         .then(response => {
             if (response.success) {
-                resultDiv.innerHTML = `
+                showMessage(`
                     <div class="alert alert-success">
                         Данные успешно обновлены!<br>
                         <a href="index.php?logout=1" class="btn btn-secondary mt-2">Выйти</a>
                     </div>
-                `;
-                resultDiv.className = 'result success';
+                `, 'success');
             } else {
                 showErrors(response.errors || { message: response.message });
             }
         })
         .catch(error => {
+            showMessage('Ошибка сети: ' + error.message, 'error');
             console.error('Error:', error);
-            resultDiv.textContent = 'Ошибка сети. Попробуйте позже.';
-            resultDiv.className = 'result error';
+        });
+    }
+    
+    function dataToXml(data) {
+        let xml = '<user>';
+        for (const key in data) {
+            if (Array.isArray(data[key])) {
+                xml += `<${key}>${data[key].join(',')}</${key}>`;
+            } else {
+                xml += `<${key}>${escapeXml(data[key])}</${key}>`;
+            }
+        }
+        xml += '</user>';
+        return xml;
+    }
+    
+    function escapeXml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe.toString()
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;');
+    }
+    
+    function parseXmlResponse(response) {
+        return response.text().then(text => {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(text, "application/xml");
+            const errorNode = xmlDoc.querySelector('parsererror');
+            if (errorNode) throw new Error('Invalid XML response');
+            
+            const result = {};
+            Array.from(xmlDoc.documentElement.children).forEach(node => {
+                result[node.nodeName] = node.textContent;
+            });
+            return result;
         });
     }
     
     function validateForm(data) {
         let isValid = true;
-        
-        // Очищаем предыдущие ошибки
         document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
         
-        // Валидация ФИО
         if (!data.full_name || !/^[A-Za-zА-Яа-я\s]{1,150}$/u.test(data.full_name)) {
             document.getElementById('full_name_error').textContent = 'Заполните корректно ФИО';
             isValid = false;
         }
         
-        // Валидация телефона
         if (!data.phone || !/^\+7\d{10}$/.test(data.phone)) {
             document.getElementById('phone_error').textContent = 'Формат: +7XXXXXXXXXX';
             isValid = false;
         }
         
-        // Валидация email
         if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
             document.getElementById('email_error').textContent = 'Заполните корректно email';
             isValid = false;
         }
         
-        // Валидация даты рождения
         if (!data.birth_date) {
             document.getElementById('birth_date_error').textContent = 'Укажите дату рождения';
             isValid = false;
         }
         
-        // Валидация пола
         if (!data.gender) {
             document.getElementById('gender_error').textContent = 'Выберите пол';
             isValid = false;
         }
         
-        // Валидация языков
         if (!data.languages || data.languages.length === 0) {
             document.getElementById('languages_error').textContent = 'Выберите хотя бы один язык';
             isValid = false;
         }
         
-        // Валидация биографии
         if (!data.biography || data.biography.length > 500) {
             document.getElementById('biography_error').textContent = 'Биография обязательна (макс. 500 символов)';
             isValid = false;
         }
         
-        // Валидация согласия
         if (!data.contract_agreed) {
             document.getElementById('contract_agreed_error').textContent = 'Необходимо согласие';
             isValid = false;
@@ -245,19 +245,33 @@ document.addEventListener('DOMContentLoaded', function() {
         return isValid;
     }
     
+    function showSuccess(response) {
+        showMessage(`
+            <div class="alert alert-success">
+                Форма успешно отправлена!<br>
+                Ваши данные для входа:<br>
+                Логин: ${response.login}<br>
+                Пароль: ${response.password}<br>
+                <a href="${response.profile_url}" class="btn btn-primary mt-2">Перейти к редактированию профиля</a>
+            </div>
+        `, 'success');
+    }
+    
     function showErrors(errors) {
-        const resultDiv = document.getElementById('form-result');
-        resultDiv.textContent = 'Ошибка: ' + (errors.message || 'Неизвестная ошибка');
-        resultDiv.className = 'result error';
+        if (errors.message) {
+            showMessage('Ошибка: ' + errors.message, 'error');
+        }
         
-        // Отображение ошибок сервера
-        if (errors) {
-            for (const field in errors) {
-                const errorElement = document.getElementById(`${field}_error`);
-                if (errorElement) {
-                    errorElement.textContent = errors[field];
-                }
+        for (const field in errors) {
+            const errorElement = document.getElementById(`${field}_error`);
+            if (errorElement) {
+                errorElement.textContent = errors[field];
             }
         }
+    }
+    
+    function showMessage(message, type) {
+        resultDiv.innerHTML = typeof message === 'string' ? message : '';
+        resultDiv.className = `result ${type}`;
     }
 });
