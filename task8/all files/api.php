@@ -26,54 +26,38 @@ switch ($method) {
 }
 
 function handleGetRequest(DatabaseRepository $db) {
-    if (!isset($_GET['action'])) {
+    if (empty($_GET['login'])) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Action parameter is required']);
+        echo json_encode(['success' => false, 'message' => 'Login parameter is required']);
         return;
     }
 
-    switch ($_GET['action']) {
-        case 'get_user':
-            if (empty($_GET['login'])) {
-                http_response_code(400);
-                echo json_encode(['success' => false, 'message' => 'Login parameter is required']);
-                return;
-            }
-
-            $user = $db->getUserByLogin($_GET['login']);
-            if (!$user) {
-                http_response_code(404);
-                echo json_encode(['success' => false, 'message' => 'User not found']);
-                return;
-            }
-
-            $user['languages'] = $db->getUserLanguages($user['id']);
-            echo json_encode(['success' => true, 'data' => $user]);
-            break;
-        
-        default:
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Unknown action']);
-            break;
+    $user = $db->getUserByLogin($_GET['login']);
+    if (!$user) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'User not found']);
+        return;
     }
+
+    $user['languages'] = $db->getUserLanguages($user['id']);
+    unset($user['pass']); // Не возвращаем хэш пароля
+    
+    echo json_encode([
+        'success' => true,
+        'data' => $user
+    ]);
 }
 
 function handlePostRequest(DatabaseRepository $db) {
-    // Получаем данные из JSON или формы
-    $contentType = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '';
+    $data = json_decode(file_get_contents('php://input'), true);
     
-    if (strpos($contentType, 'application/json') !== false) {
-        $data = json_decode(file_get_contents('php://input'), true);
-    } else {
-        $data = $_POST;
-        // Обрабатываем множественный select
-        $data['languages'] = isset($_POST['languages']) ? (is_array($_POST['languages']) ? $_POST['languages'] : [$_POST['languages']]) : [];
-        $data['contract_agreed'] = isset($_POST['contract_agreed']);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid JSON data']);
+        return;
     }
 
-    // Валидация
     $errors = Validator::validateUserForm($data);
-    
     if (!empty($errors)) {
         http_response_code(400);
         echo json_encode([
@@ -85,7 +69,6 @@ function handlePostRequest(DatabaseRepository $db) {
     }
     
     try {
-        // Создание пользователя
         $result = $db->createUser($data);
         
         echo json_encode([
@@ -93,7 +76,7 @@ function handlePostRequest(DatabaseRepository $db) {
             'message' => 'User created successfully',
             'login' => $result['login'],
             'password' => $result['pass'],
-            'profile_url' => 'index.php?login=' . urlencode($result['login'])
+            'profile_url' => 'login.php?login=' . urlencode($result['login'])
         ]);
     } catch (Exception $e) {
         http_response_code(500);
@@ -105,7 +88,6 @@ function handlePostRequest(DatabaseRepository $db) {
 }
 
 function handlePutRequest(DatabaseRepository $db) {
-    // Проверка авторизации
     if (empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) {
         http_response_code(401);
         echo json_encode(['success' => false, 'message' => 'Authentication required']);
@@ -119,17 +101,13 @@ function handlePutRequest(DatabaseRepository $db) {
         return;
     }
     
-    // Получаем данные из JSON
-    $contentType = isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '';
-    if (strpos($contentType, 'application/json') !== false) {
-        $data = json_decode(file_get_contents('php://input'), true);
-    } else {
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'JSON data required']);
+        echo json_encode(['success' => false, 'message' => 'Invalid JSON data']);
         return;
     }
     
-    // Валидация
     $errors = Validator::validateUserForm($data);
     if (!empty($errors)) {
         http_response_code(400);
@@ -142,7 +120,6 @@ function handlePutRequest(DatabaseRepository $db) {
     }
     
     try {
-        // Обновление пользователя
         $db->updateUser($user['id'], $data);
         
         echo json_encode([

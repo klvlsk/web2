@@ -5,9 +5,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Проверяем, есть ли данные для редактирования
     const urlParams = new URLSearchParams(window.location.search);
     const login = urlParams.get('login');
-    const password = urlParams.get('password');
+    const logout = urlParams.get('logout');
     
-    if (login) {
+    if (logout === '1') {
+        // Очищаем параметры URL без перезагрузки
+        history.replaceState(null, '', window.location.pathname);
+    } else if (login) {
         // Загружаем данные пользователя для редактирования
         loadUserData(login);
     }
@@ -43,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     function loadUserData(login) {
-        fetch('api.php?action=get_user&login=' + encodeURIComponent(login), {
+        fetch(`api.php?login=${encodeURIComponent(login)}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json'
@@ -53,32 +56,33 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!response.ok) throw new Error('Failed to load user data');
             return response.json();
         })
-        .then(user => {
-            if (user.success) {
+        .then(response => {
+            if (response.success) {
+                const user = response.data;
                 // Заполняем форму данными пользователя
-                form.elements.full_name.value = user.data.full_name || '';
-                form.elements.phone.value = user.data.phone || '';
-                form.elements.email.value = user.data.email || '';
-                form.elements.birth_date.value = user.data.birth_date || '';
+                form.elements.full_name.value = user.full_name || '';
+                form.elements.phone.value = user.phone || '';
+                form.elements.email.value = user.email || '';
+                form.elements.birth_date.value = user.birth_date || '';
                 
-                if (user.data.gender) {
-                    const genderRadio = form.querySelector(`input[name="gender"][value="${user.data.gender}"]`);
+                if (user.gender) {
+                    const genderRadio = form.querySelector(`input[name="gender"][value="${user.gender}"]`);
                     if (genderRadio) genderRadio.checked = true;
                 }
                 
-                if (user.data.languages) {
+                if (user.languages) {
                     Array.from(form.elements['languages[]'].options).forEach(option => {
-                        option.selected = user.data.languages.includes(parseInt(option.value));
+                        option.selected = user.languages.includes(parseInt(option.value));
                     });
                 }
                 
-                form.elements.biography.value = user.data.biography || '';
-                form.elements.contract_agreed.checked = user.data.contract_agreed || false;
+                form.elements.biography.value = user.biography || '';
+                form.elements.contract_agreed.checked = user.contract_agreed || false;
                 
                 resultDiv.textContent = 'Режим редактирования. Вы можете изменить свои данные.';
                 resultDiv.className = 'result info';
             } else {
-                throw new Error(user.message || 'Failed to load user data');
+                throw new Error(response.message || 'Failed to load user data');
             }
         })
         .catch(error => {
@@ -96,16 +100,20 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify(data)
         })
         .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                resultDiv.innerHTML = 'Форма успешно отправлена! Ваши данные для входа: Логин: ' + 
-                    data.login + ', Пароль: ' + data.password + '. Сохраните их!<br>' +
-                    '<a href="login.php" class="btn btn-primary mt-2">Войти в систему</a>';
+        .then(response => {
+            if (response.success) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        Форма успешно отправлена!<br>
+                        Ваши данные для входа:<br>
+                        Логин: ${response.login}<br>
+                        Пароль: ${response.password}<br>
+                        <a href="${response.profile_url}" class="btn btn-primary mt-2">Перейти к редактированию профиля</a>
+                    </div>
+                `;
                 resultDiv.className = 'result success';
-                
-                form.reset();
             } else {
-                showErrors(data.errors || { message: data.message });
+                showErrors(response.errors || { message: response.message });
             }
         })
         .catch(error => {
@@ -116,21 +124,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateUser(data, login) {
+        const password = prompt('Введите ваш пароль для подтверждения:');
+        if (!password) return;
+        
         fetch('api.php', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Basic ' + btoa(login + ':' + prompt('Введите ваш пароль для подтверждения:'))
+                'Authorization': 'Basic ' + btoa(login + ':' + password)
             },
             body: JSON.stringify(data)
         })
         .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                resultDiv.textContent = 'Данные успешно обновлены!';
+        .then(response => {
+            if (response.success) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        Данные успешно обновлены!<br>
+                        <a href="index.php?logout=1" class="btn btn-secondary mt-2">Выйти</a>
+                    </div>
+                `;
                 resultDiv.className = 'result success';
             } else {
-                showErrors(data.errors || { message: data.message });
+                showErrors(response.errors || { message: response.message });
             }
         })
         .catch(error => {

@@ -5,27 +5,33 @@ require_once 'template_helpers.php';
 
 session_start();
 
+// Обработка выхода
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header('Location: index.php');
+    exit();
+}
 
-$isEditMode = isset($_GET['login']);
-$login = $isEditMode ? $_GET['login'] : '';
-$password = isset($_GET['password']) ? $_GET['password'] : '';
-
-// Если это режим редактирования, загружаем данные пользователя
+// Проверяем, есть ли данные для редактирования
+$isEditMode = false;
 $userData = [];
-if ($isEditMode && $login && $password) {
+
+if (!empty($_SESSION['user'])) {
+    $isEditMode = true;
     $db = new DatabaseRepository();
-    $user = $db->checkUserCredentials($login, $password);
+    $user = $db->getUserByLogin($_SESSION['user']['login']);
+    
     if ($user) {
         $userData = [
-        'full_name' => $user['full_name'],
-        'phone' => $user['phone'],
-        'email' => $user['email'],
-        'birth_date' => $user['birth_date'],
-        'gender' => $user['gender'],
-        'biography' => $user['biography'],
-        'contract_agreed' => $user['contract_agreed'],
-        'languages' => $db->getUserLanguages($user['id'])
-    ];
+            'full_name' => $user['full_name'],
+            'phone' => $user['phone'],
+            'email' => $user['email'],
+            'birth_date' => $user['birth_date'],
+            'gender' => $user['gender'],
+            'biography' => $user['biography'],
+            'contract_agreed' => $user['contract_agreed'],
+            'languages' => $db->getUserLanguages($user['id'])
+        ];
     }
 }
 ?>

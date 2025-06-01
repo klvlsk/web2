@@ -2,16 +2,22 @@
 require_once 'DatabaseRepository.php';
 
 session_start();
-header('Content-Type: text/html; charset=UTF-8');
 
-if (!empty($_SESSION['login'])) {
+// Если пользователь уже авторизован, перенаправляем на главную
+if (!empty($_SESSION['user'])) {
+    header('Location: index.php?login=' . urlencode($_SESSION['user']['login']));
+    exit();
+}
+
+// Обработка выхода
+if (isset($_GET['logout'])) {
+    session_destroy();
     header('Location: index.php');
     exit();
 }
 
+$error_message = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $error_message = '';
-    
     if (empty($_POST['login']) || empty($_POST['pass'])) {
         $error_message = 'Логин и пароль обязательны для заполнения';
     } else {
@@ -19,9 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $user = $db->checkUserCredentials($_POST['login'], $_POST['pass']);
         
         if ($user) {
-            $_SESSION['login'] = $_POST['login'];
-            $_SESSION['uid'] = $user['id'];
-            header('Location: index.php?edit=1');
+            $_SESSION['user'] = [
+                'id' => $user['id'],
+                'login' => $user['login'],
+                'full_name' => $user['full_name']
+            ];
+            
+            // Перенаправляем на страницу с формой в режиме редактирования
+            header('Location: index.php?login=' . urlencode($user['login']));
             exit();
         } else {
             $error_message = 'Неверный логин или пароль';
