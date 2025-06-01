@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const formData = new FormData(form);
-        const selectedLanguages = Array.from(document.querySelectorAll('#languages option:checked')).map(opt => opt.value);
+        const selectedLanguages = Array.from(form.querySelectorAll('#languages option:checked')).map(opt => opt.value);
         
         const data = {
             full_name: formData.get('full_name'),

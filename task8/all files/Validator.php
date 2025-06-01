@@ -23,8 +23,16 @@ class Validator {
             $errors['gender'] = 'Выберите пол.';
         }
         
-        if (empty($data['languages']) || !is_array($data['languages']) || count($data['languages']) == 0) {
+        if (empty($data['languages']) || !is_array($data['languages']) || count($data['languages']) === 0) {
             $errors['languages'] = 'Выберите хотя бы один язык программирования.';
+        } else {
+            // Проверяем, что все выбранные языки - числа
+            foreach ($data['languages'] as $lang) {
+                if (!is_numeric($lang)) {
+                    $errors['languages'] = 'Некорректный выбор языков программирования.';
+                    break;
+                }
+            }
         }
         
         if (empty(trim($data['biography'])) || strlen($data['biography']) > 500) {

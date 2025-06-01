@@ -30,7 +30,8 @@ function handlePostRequest(DatabaseRepository $db) {
         $data = json_decode(file_get_contents('php://input'), true);
     } else {
         $data = $_POST;
-        $data['languages'] = isset($_POST['languages']) ? $_POST['languages'] : [];
+        // Обрабатываем множественный select
+        $data['languages'] = isset($_POST['languages']) ? (is_array($_POST['languages']) ? $_POST['languages'] : [$_POST['languages']]) : [];
         $data['contract_agreed'] = isset($_POST['contract_agreed']);
     }
 
