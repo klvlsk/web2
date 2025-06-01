@@ -10,6 +10,9 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 // Единая точка входа для API
 switch ($method) {
+    case 'GET':
+        handleGetRequest($db);
+        break;
     case 'POST':
         handlePostRequest($db);
         break;
@@ -20,6 +23,39 @@ switch ($method) {
         http_response_code(405);
         echo json_encode(['success' => false, 'message' => 'Method not allowed']);
         break;
+}
+
+function handleGetRequest(DatabaseRepository $db) {
+    if (!isset($_GET['action'])) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Action parameter is required']);
+        return;
+    }
+
+    switch ($_GET['action']) {
+        case 'get_user':
+            if (empty($_GET['login'])) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Login parameter is required']);
+                return;
+            }
+
+            $user = $db->getUserByLogin($_GET['login']);
+            if (!$user) {
+                http_response_code(404);
+                echo json_encode(['success' => false, 'message' => 'User not found']);
+                return;
+            }
+
+            $user['languages'] = $db->getUserLanguages($user['id']);
+            echo json_encode(['success' => true, 'data' => $user]);
+            break;
+        
+        default:
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Unknown action']);
+            break;
+    }
 }
 
 function handlePostRequest(DatabaseRepository $db) {

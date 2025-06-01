@@ -922,11 +922,10 @@ if ($isEditMode && $login && $password) {
                 </div>
 
                 <div class="col-lg-6 col-md-12">
-                    <!-- В index.php замените блок формы на этот: -->
 <form id="application-form" method="POST" action="api.php" enctype="multipart/form-data">
     <?php if ($isEditMode): ?>
         <div class="edit-notice mb-3">
-            Режим редактирования. Вы можете изменить свои данные.
+            Режим редактирования. <a href="index.php?logout=1" class="logout-link">Выйти и создать нового пользователя</a>
         </div>
     <?php endif; ?>
 

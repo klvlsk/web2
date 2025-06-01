@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const login = urlParams.get('login');
     const password = urlParams.get('password');
     
-    if (login && password) {
+    if (login) {
         // Загружаем данные пользователя для редактирования
-        loadUserData(login, password);
+        loadUserData(login);
     }
     
     form.addEventListener('submit', function(e) {
@@ -33,20 +33,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        if (login && password) {
+        if (login) {
             // Редактирование существующего пользователя
-            updateUser(data, login, password);
+            updateUser(data, login);
         } else {
             // Создание нового пользователя
             createUser(data);
         }
     });
     
-    function loadUserData(login, password) {
-        fetch('api.php', {
+    function loadUserData(login) {
+        fetch('api.php?action=get_user&login=' + encodeURIComponent(login), {
             method: 'GET',
             headers: {
-                'Authorization': 'Basic ' + btoa(login + ':' + password),
                 'Accept': 'application/json'
             }
         })
@@ -55,27 +54,32 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(user => {
-            // Заполняем форму данными пользователя
-            form.elements.full_name.value = user.full_name || '';
-            form.elements.phone.value = user.phone || '';
-            form.elements.email.value = user.email || '';
-            form.elements.birth_date.value = user.birth_date || '';
-            
-            if (user.gender) {
-                form.querySelector(`input[name="gender"][value="${user.gender}"]`).checked = true;
+            if (user.success) {
+                // Заполняем форму данными пользователя
+                form.elements.full_name.value = user.data.full_name || '';
+                form.elements.phone.value = user.data.phone || '';
+                form.elements.email.value = user.data.email || '';
+                form.elements.birth_date.value = user.data.birth_date || '';
+                
+                if (user.data.gender) {
+                    const genderRadio = form.querySelector(`input[name="gender"][value="${user.data.gender}"]`);
+                    if (genderRadio) genderRadio.checked = true;
+                }
+                
+                if (user.data.languages) {
+                    Array.from(form.elements['languages[]'].options).forEach(option => {
+                        option.selected = user.data.languages.includes(parseInt(option.value));
+                    });
+                }
+                
+                form.elements.biography.value = user.data.biography || '';
+                form.elements.contract_agreed.checked = user.data.contract_agreed || false;
+                
+                resultDiv.textContent = 'Режим редактирования. Вы можете изменить свои данные.';
+                resultDiv.className = 'result info';
+            } else {
+                throw new Error(user.message || 'Failed to load user data');
             }
-            
-            if (user.languages) {
-                Array.from(form.elements['languages[]'].options).forEach(option => {
-                    option.selected = user.languages.includes(parseInt(option.value));
-                });
-            }
-            
-            form.elements.biography.value = user.biography || '';
-            form.elements.contract_agreed.checked = user.contract_agreed || false;
-            
-            resultDiv.textContent = 'Режим редактирования. Вы можете изменить свои данные.';
-            resultDiv.className = 'result info';
         })
         .catch(error => {
             resultDiv.textContent = 'Ошибка загрузки данных: ' + error.message;
@@ -94,17 +98,10 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                resultDiv.textContent = 'Форма успешно отправлена! Ваши данные для входа: Логин: ' + 
-                    data.login + ', Пароль: ' + data.password + '. Сохраните их!';
+                resultDiv.innerHTML = 'Форма успешно отправлена! Ваши данные для входа: Логин: ' + 
+                    data.login + ', Пароль: ' + data.password + '. Сохраните их!<br>' +
+                    '<a href="login.php" class="btn btn-primary mt-2">Войти в систему</a>';
                 resultDiv.className = 'result success';
-                
-                // Добавляем ссылку на профиль
-                const profileLink = document.createElement('a');
-                profileLink.href = data.profile_url;
-                profileLink.textContent = 'Перейти к редактированию профиля';
-                profileLink.style.display = 'block';
-                profileLink.style.marginTop = '10px';
-                resultDiv.appendChild(profileLink);
                 
                 form.reset();
             } else {
@@ -118,12 +115,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function updateUser(data, login, password) {
+    function updateUser(data, login) {
         fetch('api.php', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Basic ' + btoa(login + ':' + password)
+                'Authorization': 'Basic ' + btoa(login + ':' + prompt('Введите ваш пароль для подтверждения:'))
             },
             body: JSON.stringify(data)
         })

@@ -178,4 +178,10 @@ class DatabaseRepository {
             return false;
         }
     }
+
+    public function getUserByLogin($login) {
+        $stmt = $this->db->prepare("SELECT * FROM application WHERE login = ?");
+        $stmt->execute([$login]);
+        return $stmt->fetch();
+    }
 }
