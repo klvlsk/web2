@@ -1,6 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('application-form');
     const resultDiv = document.getElementById('form-result');
+
+     // Добавляем скрытое поле для определения отключенного JavaScript
+    const noJsField = document.createElement('input');
+    noJsField.type = 'hidden';
+    noJsField.name = 'nojs';
+    noJsField.value = '0';
+    document.getElementById('application-form').appendChild(noJsField);
     
     // Проверяем, есть ли данные для редактирования
     const urlParams = new URLSearchParams(window.location.search);
@@ -91,27 +98,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    function getRequestData(data, contentType) {
+        if (contentType === 'application/xml') {
+            let xml = '<user>';
+            for (const key in data) {
+                if (Array.isArray(data[key])) {
+                    xml += `<${key}>${data[key].join(',')}</${key}>`;
+                } else {
+                    xml += `<${key}>${data[key]}</${key}>`;
+                }
+            }
+            xml += '</user>';
+            return xml;
+        }
+        return JSON.stringify(data);
+    }
+
     function createUser(data) {
+        const contentType = document.getElementById('content-type').value || 'application/json';
+        const body = getRequestData(data, contentType);
+        
         fetch('api.php', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': contentType,
             },
-            body: JSON.stringify(data)
+            body: body
         })
-        .then(response => response.json())
+        .then(response => {
+            if (contentType === 'application/xml') {
+                return response.text().then(text => {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(text, "application/xml");
+                    return {
+                        success: xmlDoc.getElementsByTagName('success')[0].textContent === 'true',
+                        message: xmlDoc.getElementsByTagName('message')[0].textContent,
+                        login: xmlDoc.getElementsByTagName('login')[0]?.textContent,
+                        password: xmlDoc.getElementsByTagName('password')[0]?.textContent,
+                        profile_url: xmlDoc.getElementsByTagName('profile_url')[0]?.textContent
+                    };
+                });
+            }
+            return response.json();
+        })
         .then(response => {
             if (response.success) {
-                resultDiv.innerHTML = `
-                    <div class="alert alert-success">
-                        Форма успешно отправлена!<br>
-                        Ваши данные для входа:<br>
-                        Логин: ${response.login}<br>
-                        Пароль: ${response.password}<br>
-                        <a href="${response.profile_url}" class="btn btn-primary mt-2">Перейти к редактированию профиля</a>
-                    </div>
-                `;
-                resultDiv.className = 'result success';
+                // Обработка успешного создания пользователя
             } else {
                 showErrors(response.errors || { message: response.message });
             }

@@ -1,0 +1,12 @@
+# Включаем механизм перезаписи URL
+RewriteEngine On
+
+# Не применять правила к реальным файлам и директориям
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Перенаправляем все запросы, начинающиеся с /api/ на api.php
+RewriteRule ^api/(.*)$ api.php/$1 [L,QSA]
+
+# Для старых URL оставляем возможность прямого обращения к api.php
+RewriteRule ^api\.php$ - [L]

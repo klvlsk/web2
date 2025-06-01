@@ -7,17 +7,45 @@ session_start();
 
 $db = new DatabaseRepository();
 $method = $_SERVER['REQUEST_METHOD'];
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
 
 // Единая точка входа для API
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$pathParts = explode('/', $path);
+$resource = $pathParts[count($pathParts) - 2]; // api.php/{resource}
+$resourceId = $pathParts[count($pathParts) - 1] ?? null;
+
+// Определяем тип контента и парсим данные
+if ($method === 'POST' || $method === 'PUT') {
+    $input = file_get_contents('php://input');
+    
+    if (strpos($contentType, 'application/xml') !== false) {
+        $data = simplexml_load_string($input);
+        if ($data === false) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid XML data']);
+            exit;
+        }
+        $data = json_decode(json_encode($data), true);
+    } else {
+        $data = json_decode($input, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid JSON data']);
+            exit;
+        }
+    }
+}
+
 switch ($method) {
     case 'GET':
-        handleGetRequest($db);
+        handleGetRequest($db, $resourceId);
         break;
     case 'POST':
-        handlePostRequest($db);
+        handlePostRequest($db, $data);
         break;
     case 'PUT':
-        handlePutRequest($db);
+        handlePutRequest($db, $resourceId, $data);
         break;
     default:
         http_response_code(405);
@@ -25,14 +53,14 @@ switch ($method) {
         break;
 }
 
-function handleGetRequest(DatabaseRepository $db) {
-    if (empty($_GET['login'])) {
+function handleGetRequest(DatabaseRepository $db, $userId) {
+    if (empty($userId)) {
         http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Login parameter is required']);
+        echo json_encode(['success' => false, 'message' => 'User ID is required']);
         return;
     }
 
-    $user = $db->getUserByLogin($_GET['login']);
+    $user = $db->getUser($userId);
     if (!$user) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'User not found']);
@@ -40,7 +68,7 @@ function handleGetRequest(DatabaseRepository $db) {
     }
 
     $user['languages'] = $db->getUserLanguages($user['id']);
-    unset($user['pass']); // Не возвращаем хэш пароля
+    unset($user['pass']);
     
     echo json_encode([
         'success' => true,
@@ -48,15 +76,7 @@ function handleGetRequest(DatabaseRepository $db) {
     ]);
 }
 
-function handlePostRequest(DatabaseRepository $db) {
-    $data = json_decode(file_get_contents('php://input'), true);
-    
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Invalid JSON data']);
-        return;
-    }
-
+function handlePostRequest(DatabaseRepository $db, $data) {
     $errors = Validator::validateUserForm($data);
     if (!empty($errors)) {
         http_response_code(400);
@@ -76,7 +96,7 @@ function handlePostRequest(DatabaseRepository $db) {
             'message' => 'User created successfully',
             'login' => $result['login'],
             'password' => $result['pass'],
-            'profile_url' => 'login.php?login=' . urlencode($result['login'])
+            'profile_url' => 'index.php?login=' . urlencode($result['login'])
         ]);
     } catch (Exception $e) {
         http_response_code(500);
@@ -87,7 +107,7 @@ function handlePostRequest(DatabaseRepository $db) {
     }
 }
 
-function handlePutRequest(DatabaseRepository $db) {
+function handlePutRequest(DatabaseRepository $db, $userId, $data) {
     if (empty($_SERVER['PHP_AUTH_USER']) || empty($_SERVER['PHP_AUTH_PW'])) {
         http_response_code(401);
         echo json_encode(['success' => false, 'message' => 'Authentication required']);
@@ -95,16 +115,9 @@ function handlePutRequest(DatabaseRepository $db) {
     }
     
     $user = $db->checkUserCredentials($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
-    if (!$user) {
+    if (!$user || $user['id'] != $userId) {
         http_response_code(403);
         echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
-        return;
-    }
-    
-    $data = json_decode(file_get_contents('php://input'), true);
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'Invalid JSON data']);
         return;
     }
     
@@ -120,7 +133,7 @@ function handlePutRequest(DatabaseRepository $db) {
     }
     
     try {
-        $db->updateUser($user['id'], $data);
+        $db->updateUser($userId, $data);
         
         echo json_encode([
             'success' => true,

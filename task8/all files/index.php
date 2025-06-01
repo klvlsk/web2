@@ -34,6 +34,53 @@ if (!empty($_SESSION['user'])) {
         ];
     }
 }
+
+// Добавляем в начало файла обработку POST-запроса без JavaScript
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['nojs'])) {
+    require_once 'DatabaseRepository.php';
+    require_once 'Validator.php';
+    
+    $data = [
+        'full_name' => $_POST['full_name'],
+        'phone' => $_POST['phone'],
+        'email' => $_POST['email'],
+        'birth_date' => $_POST['birth_date'],
+        'gender' => $_POST['gender'],
+        'languages' => $_POST['languages'] ?? [],
+        'biography' => $_POST['biography'],
+        'contract_agreed' => isset($_POST['contract_agreed'])
+    ];
+    
+    $errors = Validator::validateUserForm($data);
+    
+    if (empty($errors)) {
+        $db = new DatabaseRepository();
+        
+        if (!empty($_SESSION['user'])) {
+            // Редактирование существующего пользователя
+            $user = $db->getUserByLogin($_SESSION['user']['login']);
+            if ($user && $_POST['password']) {
+                if (md5($_POST['password']) === $user['pass']) {
+                    $db->updateUser($user['id'], $data);
+                    $_SESSION['message'] = 'Данные успешно обновлены';
+                } else {
+                    $_SESSION['errors']['general'] = 'Неверный пароль';
+                }
+            }
+        } else {
+            // Создание нового пользователя
+            $result = $db->createUser($data);
+            $_SESSION['message'] = 'Пользователь создан. Логин: ' . $result['login'] . 
+                                  ', Пароль: ' . $result['pass'];
+        }
+    } else {
+        $_SESSION['errors'] = $errors;
+        $_SESSION['values'] = $_POST;
+    }
+    
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -1002,6 +1049,14 @@ if (!empty($_SESSION['user'])) {
               <div class="error-message" id="biography_error"></div>
           </div>
           
+          <div class="mb-3">
+    <label class="text-white">Формат данных:</label>
+    <select id="content-type" name="content-type" class="form-control">
+        <option value="application/json">JSON</option>
+        <option value="application/xml">XML</option>
+    </select>
+</div>
+
           <div class="form-check mb-3">
               <input class="form-check-input" type="checkbox" id="contract_agreed" name="contract_agreed" 
                     <?= isset($userData['contract_agreed']) && $userData['contract_agreed'] ? 'checked' : '' ?> required>
