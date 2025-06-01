@@ -11,9 +11,9 @@ div.pup {
     text-align: center;
 }
 
-div.pup h1 {
+.pup h1 {
     font-weight: revert;
-    font-size: 50px;
+    font-size: 50px !important;
     line-height: 35px;
     padding-left: 100px;
     padding-right: 100px;
