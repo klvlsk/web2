@@ -1,7 +1,72 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('application-form');
     
-    // Валидация на клиенте
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const selectedLanguages = Array.from(document.querySelectorAll('#languages option:checked')).map(opt => opt.value);
+        
+        const data = {
+            full_name: formData.get('full_name'),
+            phone: formData.get('phone'),
+            email: formData.get('email'),
+            birth_date: formData.get('birth_date'),
+            gender: formData.get('gender'),
+            languages: selectedLanguages,
+            biography: formData.get('biography'),
+            contract_agreed: formData.get('contract_agreed') === 'on'
+        };
+        
+        // Валидация и отправка остаются без изменений
+        if (!validateForm(data)) {
+            return;
+        }
+        
+        fetch('api.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const resultDiv = document.getElementById('form-result');
+            if (data.success) {
+                resultDiv.textContent = 'Форма успешно отправлена!';
+                resultDiv.className = 'result success';
+                if (data.login && data.password) {
+                    resultDiv.textContent += ` Ваши данные для входа: Логин: ${data.login}, Пароль: ${data.password}`;
+                }
+                form.reset();
+            } else {
+                resultDiv.textContent = 'Ошибка: ' + (data.message || 'Неизвестная ошибка');
+                resultDiv.className = 'result error';
+                
+                // Отображение ошибок сервера
+                if (data.errors) {
+                    for (const field in data.errors) {
+                        const errorElement = document.getElementById(`${field}_error`);
+                        if (errorElement) {
+                            errorElement.textContent = data.errors[field];
+                        }
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('form-result').textContent = 'Ошибка сети. Попробуйте позже.';
+            document.getElementById('form-result').className = 'result error';
+        });
+
+        // Фоллбек для браузеров без JavaScript
+        form.setAttribute('action', 'api.php');
+        form.setAttribute('method', 'POST');
+
+    });
+    
     function validateForm(data) {
         let isValid = true;
         
@@ -58,70 +123,4 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return isValid;
     }
-    
-    // Обработка отправки формы
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(form);
-        const data = {
-            full_name: formData.get('full_name'),
-            phone: formData.get('phone'),
-            email: formData.get('email'),
-            birth_date: formData.get('birth_date'),
-            gender: formData.get('gender'),
-            languages: Array.from(document.querySelectorAll('#languages option:checked')).map(opt => opt.value),
-            biography: formData.get('biography'),
-            contract_agreed: formData.get('contract_agreed') === 'on'
-        };
-        
-        // Валидация на клиенте
-        if (!validateForm(data)) {
-            return;
-        }
-        
-        // Отправка AJAX
-        fetch('api.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            const resultDiv = document.getElementById('form-result');
-            if (data.success) {
-                resultDiv.textContent = 'Форма успешно отправлена!';
-                resultDiv.className = 'result success';
-                if (data.login && data.password) {
-                    resultDiv.textContent += ` Ваши данные для входа: Логин: ${data.login}, Пароль: ${data.password}`;
-                }
-                form.reset();
-            } else {
-                resultDiv.textContent = 'Ошибка: ' + (data.message || 'Неизвестная ошибка');
-                resultDiv.className = 'result error';
-                
-                // Отображение ошибок сервера
-                if (data.errors) {
-                    for (const field in data.errors) {
-                        const errorElement = document.getElementById(`${field}_error`);
-                        if (errorElement) {
-                            errorElement.textContent = data.errors[field];
-                        }
-                    }
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('form-result').textContent = 'Ошибка сети. Попробуйте позже.';
-            document.getElementById('form-result').className = 'result error';
-        });
-    });
-    
-    // Фоллбек для браузеров без JavaScript
-    form.setAttribute('action', 'api.php');
-    form.setAttribute('method', 'POST');
 });

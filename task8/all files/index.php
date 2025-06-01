@@ -1,3 +1,11 @@
+<?php
+require_once 'DatabaseRepository.php';
+require_once 'Validator.php';
+require_once 'template_helpers.php';
+
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="ru">
   <head>
