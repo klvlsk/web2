@@ -7,11 +7,11 @@
     text-decoration: none;
 }
 
-div.adv {
+div.pup {
     text-align: center;
 }
 
-div.adv h1 {
+div.pup h1 {
     font-weight: revert;
     font-size: 25px;
     line-height: 35px;
@@ -19,7 +19,7 @@ div.adv h1 {
     padding-right: 100px;
 }
 
-div.adv p {
+div.pup p {
     margin-top: 20px;
     padding-left: 30px;
     padding-right: 40px;
@@ -164,7 +164,7 @@ header video {
     object-fit: cover;
 }
 
-div.adv h1 {
+div.pup h1 {
     padding-top: 30px;
     margin-top: 0px;
 }
@@ -449,13 +449,13 @@ button {
         margin-top: 8.3%;
     }
 
-    div.adv {
+    div.pup {
         max-height: 306px;
         float: left;
         text-align: left;
     }
 
-    div.adv h1 {
+    div.pup h1 {
         font-weight: 1000;
         font-size: 52px;
         line-height: 60px;
@@ -467,14 +467,14 @@ button {
         max-width: 90%;
     }
 
-    div.adv p {
+    div.pup p {
         margin-top: 15px;
         padding-left: 0px;
         padding-right: 0px;
         max-width: 90%;
     }
 
-    div.adv button {
+    div.pup button {
         margin-top: 55px;
     }
 
