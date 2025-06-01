@@ -22,9 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error_message = 'Логин и пароль обязательны для заполнения';
     } else {
         $db = new DatabaseRepository();
-        $user = $db->checkUserCredentials($_POST['login'], $_POST['pass']);
+        $user = $db->getUserByLogin($_POST['login']);
         
-        if ($user) {
+        if ($user && md5($_POST['pass']) === $user['pass']) {
             $_SESSION['user'] = [
                 'id' => $user['id'],
                 'login' => $user['login'],

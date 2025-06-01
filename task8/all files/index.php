@@ -929,93 +929,93 @@ if (!empty($_SESSION['user'])) {
 
                 <div class="col-lg-6 col-md-12">
 <form id="application-form" method="POST" action="api.php" enctype="multipart/form-data">
-    <?php if ($isEditMode): ?>
-        <div class="edit-notice mb-3">
-            Режим редактирования. <a href="index.php?logout=1" class="logout-link">Выйти и создать нового пользователя</a>
-        </div>
-    <?php endif; ?>
+          <?php if ($isEditMode): ?>
+              <div class="edit-notice mb-3">
+                  Режим редактирования. <a href="index.php?logout=1" class="logout-link">Выйти и создать нового пользователя</a>
+              </div>
+          <?php endif; ?>
 
-    <div class="mb-2">
-        <input type="text" class="form-control" name="full_name" id="full_name" placeholder="ФИО" 
-               value="<?= htmlspecialchars($userData['full_name'] ?? '') ?>" required pattern="[A-Za-zА-Яа-я\s]{1,150}" maxlength="150">
-        <div class="error-message" id="full_name_error"></div>
-    </div>
+          <div class="mb-2">
+              <input type="text" class="form-control" name="full_name" id="full_name" placeholder="ФИО" 
+                     value="<?= htmlspecialchars($userData['full_name'] ?? '') ?>" required pattern="[A-Za-zА-Яа-я\s]{1,150}" maxlength="150">
+              <div class="error-message" id="full_name_error"></div>
+          </div>
 
-    <div class="mb-2">
-        <input type="tel" class="form-control" name="phone" id="phone" placeholder="Телефон (+7XXXXXXXXXX)" 
-               value="<?= htmlspecialchars($userData['phone'] ?? '') ?>" required pattern="\+7\d{10}">
-        <div class="error-message" id="phone_error"></div>
-    </div>
+          <div class="mb-2">
+              <input type="tel" class="form-control" name="phone" id="phone" placeholder="Телефон (+7XXXXXXXXXX)" 
+                     value="<?= htmlspecialchars($userData['phone'] ?? '') ?>" required pattern="\+7\d{10}">
+              <div class="error-message" id="phone_error"></div>
+          </div>
 
-    <div class="mb-2">
-        <input type="email" class="form-control" name="email" id="email" placeholder="E-mail" 
-               value="<?= htmlspecialchars($userData['email'] ?? '') ?>" required>
-        <div class="error-message" id="email_error"></div>
-    </div>
+          <div class="mb-2">
+              <input type="email" class="form-control" name="email" id="email" placeholder="E-mail" 
+                     value="<?= htmlspecialchars($userData['email'] ?? '') ?>" required>
+              <div class="error-message" id="email_error"></div>
+          </div>
 
-    <div class="mb-2">
-        <input type="date" class="form-control" name="birth_date" id="birth_date" placeholder="Дата рождения" 
-               value="<?= htmlspecialchars($userData['birth_date'] ?? '') ?>" required>
-        <div class="error-message" id="birth_date_error"></div>
-    </div>
-    
-    <div class="mb-2">
-        <label class="text-white">Пол:</label>
-        <div class="radio-group">
-            <label class="text-white me-3">
-                <input type="radio" name="gender" value="male" 
-                       <?= ($userData['gender'] ?? '') === 'male' ? 'checked' : '' ?> required> Мужской
-            </label>
-            <label class="text-white">
-                <input type="radio" name="gender" value="female" 
-                       <?= ($userData['gender'] ?? '') === 'female' ? 'checked' : '' ?>> Женский
-            </label>
-        </div>
-        <div class="error-message" id="gender_error"></div>
-    </div>
-    
-    <div class="mb-2">
-        <label class="text-white">Любимый язык программирования:</label>
-        <select name="languages[]" id="languages" multiple required class="form-control">
-            <?php 
-            $db = new DatabaseRepository();
-            $allLanguages = $db->getAllLanguages();
-            $selectedLanguages = $userData['languages'] ?? [];
-            
-            foreach ($allLanguages as $lang): 
-                $selected = in_array($lang['id'], $selectedLanguages) ? 'selected' : '';
-            ?>
-                <option value="<?= $lang['id'] ?>" <?= $selected ?>>
-                    <?= htmlspecialchars($lang['language_name']) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-        <div class="error-message" id="languages_error"></div>
-        <small class="text-white">Удерживайте Ctrl для выбора нескольких языков</small>
-    </div>
-    
-    <div class="mb-2">
-        <label for="biography" class="text-white">Биография:</label>
-        <textarea class="form-control" name="biography" id="biography" required maxlength="500"><?= 
-            htmlspecialchars($userData['biography'] ?? '') 
-        ?></textarea>
-        <div class="error-message" id="biography_error"></div>
-    </div>
-    
-    <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" id="contract_agreed" name="contract_agreed" 
-              <?= isset($userData['contract_agreed']) && $userData['contract_agreed'] ? 'checked' : '' ?> required>
-        <label class="form-check-label text-white" for="contract_agreed">
-            Согласен с контрактом
-        </label>
-        <div class="error-message" id="contract_agreed_error"></div>
-    </div>
-    
-    <button type="submit" class="btn btn-danger w-100">
-        <?= $isEditMode ? 'Обновить данные' : 'Отправить' ?>
-    </button>
-</form>
-<div id="form-result" class="result"></div>
+          <div class="mb-2">
+              <input type="date" class="form-control" name="birth_date" id="birth_date" placeholder="Дата рождения" 
+                     value="<?= htmlspecialchars($userData['birth_date'] ?? '') ?>" required>
+              <div class="error-message" id="birth_date_error"></div>
+          </div>
+          
+          <div class="mb-2">
+              <label class="text-white">Пол:</label>
+              <div class="radio-group">
+                  <label class="text-white me-3">
+                      <input type="radio" name="gender" value="male" 
+                             <?= ($userData['gender'] ?? '') === 'male' ? 'checked' : '' ?> required> Мужской
+                  </label>
+                  <label class="text-white">
+                      <input type="radio" name="gender" value="female" 
+                             <?= ($userData['gender'] ?? '') === 'female' ? 'checked' : '' ?>> Женский
+                  </label>
+              </div>
+              <div class="error-message" id="gender_error"></div>
+          </div>
+          
+          <div class="mb-2">
+              <label class="text-white">Любимый язык программирования:</label>
+              <select name="languages[]" id="languages" multiple required class="form-control">
+                  <?php 
+                  $db = new DatabaseRepository();
+                  $allLanguages = $db->getAllLanguages();
+                  $selectedLanguages = $userData['languages'] ?? [];
+                  
+                  foreach ($allLanguages as $lang): 
+                      $selected = in_array($lang['id'], $selectedLanguages) ? 'selected' : '';
+                  ?>
+                      <option value="<?= $lang['id'] ?>" <?= $selected ?>>
+                          <?= htmlspecialchars($lang['language_name']) ?>
+                      </option>
+                  <?php endforeach; ?>
+              </select>
+              <div class="error-message" id="languages_error"></div>
+              <small class="text-white">Удерживайте Ctrl для выбора нескольких языков</small>
+          </div>
+          
+          <div class="mb-2">
+              <label for="biography" class="text-white">Биография:</label>
+              <textarea class="form-control" name="biography" id="biography" required maxlength="500"><?= 
+                  htmlspecialchars($userData['biography'] ?? '') 
+              ?></textarea>
+              <div class="error-message" id="biography_error"></div>
+          </div>
+          
+          <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="contract_agreed" name="contract_agreed" 
+                    <?= isset($userData['contract_agreed']) && $userData['contract_agreed'] ? 'checked' : '' ?> required>
+              <label class="form-check-label text-white" for="contract_agreed">
+                  Согласен с контрактом
+              </label>
+              <div class="error-message" id="contract_agreed_error"></div>
+          </div>
+          
+          <button type="submit" class="btn btn-danger w-100">
+              <?= $isEditMode ? 'Обновить данные' : 'Отправить' ?>
+          </button>
+      </form>
+      <div id="form-result" class="result"></div>
                 </div>
             </div>
 
