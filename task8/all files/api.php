@@ -55,7 +55,8 @@ function handlePostRequest(DatabaseRepository $db) {
             'success' => true,
             'message' => 'User created successfully',
             'login' => $result['login'],
-            'password' => $result['pass']
+            'password' => $result['pass'],
+            'profile_url' => 'index.php?login=' . urlencode($result['login'])
         ]);
     } catch (Exception $e) {
         http_response_code(500);
