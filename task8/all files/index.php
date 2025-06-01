@@ -1049,14 +1049,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['nojs'])) {
               <div class="error-message" id="biography_error"></div>
           </div>
           
-          <div class="mb-3">
-    <label class="text-white">Формат данных:</label>
-    <select id="content-type" name="content-type" class="form-control">
-        <option value="application/json">JSON</option>
-        <option value="application/xml">XML</option>
-    </select>
-</div>
-
           <div class="form-check mb-3">
               <input class="form-check-input" type="checkbox" id="contract_agreed" name="contract_agreed" 
                     <?= isset($userData['contract_agreed']) && $userData['contract_agreed'] ? 'checked' : '' ?> required>
