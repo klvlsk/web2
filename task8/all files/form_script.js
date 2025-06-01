@@ -159,7 +159,7 @@ function dataToXml(data) {
     xml += `<email>${escapeXml(data.email)}</email>`;
     xml += `<birth_date>${escapeXml(data.birth_date)}</birth_date>`;
     xml += `<gender>${escapeXml(data.gender)}</gender>`;
-    xml += `<languages>${data.languages.join(',')}</languages>`;
+    xml += `<languages>${data.languages.map(lang => `<language>${lang}</language>`).join('')}</languages>`;
     xml += `<biography>${escapeXml(data.biography)}</biography>`;
     xml += `<contract_agreed>${data.contract_agreed}</contract_agreed>`;
     xml += '</user>';
@@ -214,19 +214,45 @@ function dataToXml(data) {
     }
     
     function parseXmlResponse(response) {
-        return response.text().then(text => {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(text, "application/xml");
-            const errorNode = xmlDoc.querySelector('parsererror');
-            if (errorNode) throw new Error('Invalid XML response');
-            
-            const result = {};
-            Array.from(xmlDoc.documentElement.children).forEach(node => {
-                result[node.nodeName] = node.textContent;
+    return response.text().then(text => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(text, "application/xml");
+        const errorNode = xmlDoc.querySelector('parsererror');
+        if (errorNode) {
+            console.error('XML Parse Error:', errorNode.textContent);
+            throw new Error('Invalid XML response');
+        }
+        
+        const result = {
+            success: xmlDoc.querySelector('success')?.textContent === 'true',
+            message: xmlDoc.querySelector('message')?.textContent || '',
+            errors: {}
+        };
+
+        // Обработка ошибок
+        const errors = xmlDoc.querySelector('errors');
+        if (errors) {
+            Array.from(errors.children).forEach(error => {
+                result.errors[error.nodeName] = error.textContent;
             });
-            return result;
-        });
-    }
+        }
+
+        // Обработка дополнительных данных
+        const data = xmlDoc.querySelector('data');
+        if (data) {
+            result.data = {};
+            Array.from(data.children).forEach(node => {
+                if (node.nodeName === 'languages') {
+                    result.data.languages = Array.from(node.children).map(lang => lang.textContent);
+                } else {
+                    result.data[node.nodeName] = node.textContent;
+                }
+            });
+        }
+
+        return result;
+    });
+}
     
     function validateForm(data) {
         let isValid = true;

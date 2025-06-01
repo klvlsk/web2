@@ -18,30 +18,27 @@ $data = [];
 
 if ($method === 'POST' || $method === 'PUT') {
     if (strpos($contentType, 'application/xml') !== false) {
-        try {
-            libxml_use_internal_errors(true);
-            $xml = simplexml_load_string($input);
-            if ($xml === false) {
-                throw new Exception('Invalid XML: ' . libxml_get_last_error()->message);
-            }
-            $data = json_decode(json_encode($xml), true);
-        } catch (Exception $e) {
-            sendResponse(400, [
-                'success' => false,
-                'message' => $e->getMessage()
-            ], $responseType);
-            exit;
+    try {
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($input);
+        if ($xml === false) {
+            throw new Exception('Invalid XML: ' . libxml_get_last_error()->message);
         }
-    } else {
-        $data = json_decode($input, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            sendResponse(400, [
-                'success' => false,
-                'message' => 'Invalid JSON data'
-            ], $responseType);
-            exit;
+        $data = json_decode(json_encode($xml), true);
+        // Добавьте обработку языков
+        if (isset($data['languages']) && is_array($data['languages']['language'])) {
+            $data['languages'] = $data['languages']['language'];
+        } elseif (isset($data['languages']['language'])) {
+            $data['languages'] = [$data['languages']['language']];
         }
+    } catch (Exception $e) {
+        sendResponse(400, [
+            'success' => false,
+            'message' => $e->getMessage()
+        ], $responseType);
+        exit;
     }
+}
 }
 
 // Обработка запросов
@@ -181,7 +178,29 @@ function arrayToXml($data, $rootNode = 'response') {
     
     foreach ($data as $key => $value) {
         if (is_array($value)) {
-            $xml .= arrayToXml($value, $key);
+            if ($key === 'errors') {
+                $xml .= "<$key>";
+                foreach ($value as $errorKey => $errorValue) {
+                    $xml .= "<$errorKey>" . htmlspecialchars($errorValue) . "</$errorKey>";
+                }
+                $xml .= "</$key>";
+            } elseif ($key === 'data') {
+                $xml .= "<$key>";
+                foreach ($value as $dataKey => $dataValue) {
+                    if ($dataKey === 'languages' && is_array($dataValue)) {
+                        $xml .= "<$dataKey>";
+                        foreach ($dataValue as $lang) {
+                            $xml .= "<language>" . htmlspecialchars($lang) . "</language>";
+                        }
+                        $xml .= "</$dataKey>";
+                    } else {
+                        $xml .= "<$dataKey>" . htmlspecialchars($dataValue) . "</$dataKey>";
+                    }
+                }
+                $xml .= "</$data>";
+            } else {
+                $xml .= arrayToXml($value, $key);
+            }
         } else {
             $xml .= "<$key>" . htmlspecialchars($value) . "</$key>";
         }

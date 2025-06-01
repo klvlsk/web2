@@ -10,3 +10,7 @@ RewriteRule ^api/(.*)$ api.php/$1 [L,QSA]
 
 # Для старых URL оставляем возможность прямого обращения к api.php
 RewriteRule ^api\.php$ - [L]
+
+# Добавьте эти строки в .htaccess
+RewriteCond %{HTTP:Content-Type} ^application/xml [NC]
+RewriteRule .* - [E=CONTENT_TYPE:application/xml]
